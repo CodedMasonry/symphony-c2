@@ -1,5 +1,5 @@
 packages:
-  # include all projects in the subfolders of 'apps' and 'packages'
-  # - "apps/*"
-  # - "packages/*"
-  - "symphony-overture"
+  - symphony-overture
+
+onlyBuiltDependencies:
+  - protobufjs
