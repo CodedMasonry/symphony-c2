@@ -7,8 +7,10 @@ import { viteStaticCopy } from "vite-plugin-static-copy";
 const cesiumSource = "node_modules/cesium/Build/Cesium";
 const cesiumBaseUrl = "cesiumStatic";
 
-// https://vite.dev/config/
-export default defineConfig({
+// @ts-expect-error process is a nodejs global
+const host = process.env.TAURI_DEV_HOST;
+
+export default defineConfig(() => ({
   plugins: [
     react(),
     tailwindcss(),
@@ -29,4 +31,22 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-});
+
+  // Tauri specific config
+  clearScreen: false,
+  server: {
+    port: 1420,
+    strictPort: true,
+    host: host || false,
+    hmr: host
+      ? {
+          protocol: "ws",
+          host,
+          port: 1421,
+        }
+      : undefined,
+    watch: {
+      ignored: ["**/src-tauri/**"],
+    },
+  },
+}));

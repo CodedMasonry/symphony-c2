@@ -5,7 +5,7 @@ import { TopBar } from "./components/top-bar";
 
 export function App() {
   return (
-    <div className="dark flex flex-col bg-background w-full h-screen overflow-hidden">
+    <div className="dark flex flex-col bg-background text-foreground w-full h-screen overflow-hidden">
       <TopBar className="h-8" />
       <div className="grid grid-cols-12 overflow-hidden h-full pb-8">
         <LeftSidebar className="col-span-1" />

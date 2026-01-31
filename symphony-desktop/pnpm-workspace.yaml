@@ -1,5 +1,4 @@
-packages:
-  - symphony-overture
-
 onlyBuiltDependencies:
+  - esbuild
+  - msw
   - protobufjs
