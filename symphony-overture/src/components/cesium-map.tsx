@@ -23,16 +23,15 @@ function CesiumMap({ className, ...props }: React.ComponentProps<"div">) {
     // Initialize the Cesium Viewer
     if (cesiumContainerRef.current && !viewerRef.current) {
       viewerRef.current = new Cesium.Viewer(cesiumContainerRef.current, {
+        terrain: Cesium.Terrain.fromWorldTerrain(),
         baseLayerPicker: false,
-        geocoder: Cesium.IonGeocodeProviderType.GOOGLE,
+        geocoder: false,
         homeButton: false,
         sceneModePicker: false,
         navigationHelpButton: false,
         animation: false,
         timeline: false,
         fullscreenButton: false,
-        scene3DOnly: true,
-        globe: false,
       });
 
       // Default position
@@ -49,25 +48,10 @@ function CesiumMap({ className, ...props }: React.ComponentProps<"div">) {
         ),
       });
 
-      // Enable skybox
-      if (viewerRef.current?.scene.skyAtmosphere) {
-        viewerRef.current.scene.skyAtmosphere.show = true;
-      }
-
-      // Add Photorealistic 3D Tiles
-      const addTileset = async () => {
-        try {
-          const tileset = await Cesium.createGooglePhotorealistic3DTileset({
-            onlyUsingWithGoogleGeocoder: true,
-          });
-          // Corrected: Reference viewer.scene instead of a global scene
-          viewerRef.current!.scene.primitives.add(tileset);
-        } catch (error) {
-          console.error("Error loading Photorealistic 3D Tiles:", error);
-        }
-      };
-
-      addTileset();
+      // Set initial camera position
+      viewerRef.current.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(-74.006, 40.7128, 3000000), // NYC
+      });
     }
 
     // Cleanup on unmount
