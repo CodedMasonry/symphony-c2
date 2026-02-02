@@ -5,9 +5,9 @@ import { TopBar } from "./components/top-bar";
 
 export function App() {
   return (
-    <div className="dark flex flex-col bg-background text-foreground w-full h-screen overflow-hidden">
-      <TopBar className="h-8" />
-      <div className="grid grid-cols-12 overflow-hidden h-full pb-8">
+    <div className="flex flex-col bg-background text-foreground w-full h-screen overflow-hidden">
+      <TopBar className="h-fit" />
+      <div className="grid grid-cols-12 overflow-hidden h-full">
         <LeftSidebar className="col-span-1" />
         <CesiumMap className="col-span-10" />
         <RightSideBar className="col-span-1" />
