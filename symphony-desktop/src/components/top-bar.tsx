@@ -10,6 +10,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import {
+  Close,
   HelpCircleIcon,
   Logout,
   SettingsIcon,
@@ -18,7 +19,10 @@ import { HugeiconsIcon } from "@hugeicons/react";
 
 function TopBar({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div className={cn("px-1 border-b border-border", className)} {...props}>
+    <div
+      className={cn("flex align-middle px-1 border-b border-border", className)}
+      {...props}
+    >
       <Menubar className="border-0">
         <MenubarMenu>
           <MenubarTrigger>File</MenubarTrigger>
@@ -41,6 +45,9 @@ function TopBar({ className, ...props }: React.ComponentProps<"div">) {
           </MenubarContent>
         </MenubarMenu>
       </Menubar>
+      <div className="flex ml-auto my-auto">
+        <HugeiconsIcon icon={Close} strokeWidth={2} />
+      </div>
     </div>
   );
 }
