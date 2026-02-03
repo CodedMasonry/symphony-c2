@@ -12,6 +12,14 @@ pub enum ObjectDesignation {
 /// This includes everything from aircrafts, ground units, to any point in space that can be tracked
 pub struct Object {
     /*
+     * Identification
+     */
+    /// Unique ID assigned to track object
+    object_id: u64,
+    /// Designated alliance
+    designation: ObjectDesignation,
+
+    /*
      * Position
      */
     /// GPS Longitude
@@ -22,14 +30,6 @@ pub struct Object {
     altitude: f32,
     /// Measured in Degrees
     heading: f32,
-
-    /*
-     * Identification
-     */
-    /// Unique ID assigned to track object
-    object_id: u64,
-    /// Designated alliance
-    designation: ObjectDesignation,
 }
 
 /// Inherited type for all tasks
