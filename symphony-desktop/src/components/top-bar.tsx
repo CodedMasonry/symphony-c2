@@ -15,9 +15,6 @@ import {
   Expand,
   HelpCircleIcon,
   Logout,
-  Maximize,
-  Maximize01Icon,
-  Minimize,
   Minus,
   SettingsIcon,
 } from "@hugeicons/core-free-icons";
@@ -30,7 +27,10 @@ function TopBar({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-tauri-drag-region
-      className={cn("flex align-middle px-2 border-b border-border", className)}
+      className={cn(
+        "flex align-middle px-2 border-b-2 border-border",
+        className,
+      )}
       {...props}
     >
       <Menubar className="border-0">
