@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "commons",
+    "symphony-conductor",
+    "symphony-desktop/src-tauri"
+]
+
+resolver = "2"

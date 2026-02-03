@@ -3,8 +3,6 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/jetbrains-mono";
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
     --radius: 0rem;
     --background: oklch(0.141 0.005 285.823);

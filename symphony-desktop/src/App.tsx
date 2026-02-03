@@ -8,9 +8,8 @@ export function App() {
     <div className="flex flex-col bg-background text-foreground w-full h-screen overflow-hidden">
       <TopBar className="h-fit" />
       <div className="grid grid-cols-12 overflow-hidden h-full">
-        <LeftSidebar className="col-span-1" />
+        <LeftSidebar className="col-span-2" />
         <CesiumMap className="col-span-10" />
-        <RightSideBar className="col-span-1" />
       </div>
     </div>
   );
