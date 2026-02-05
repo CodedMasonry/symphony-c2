@@ -4,3 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+rkyv = "0.8.14"
+serde = { version = "1.0.228", features = ["derive"] }
+typeshare = "1.0.5"
+ulid = { version = "1.2.1", features = ["rkyv", "serde"] }
