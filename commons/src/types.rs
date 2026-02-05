@@ -1,46 +1,56 @@
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+use ulid::Ulid;
 
-/// Designation of object
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
+// ============================================================================
+// Core Types
+// ============================================================================
+
+/// Designation/alliance of an object
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[repr(u8)]
 pub enum ObjectDesignation {
-    UNKNOWN,
-    HOSTILE,
-    CIVILIAN,
-    ALLY,
-    FRIENDLY,
+    UNKNOWN = 0,
+    HOSTILE = 1,
+    CIVILIAN = 2,
+    ALLY = 3,
+    FRIENDLY = 4,
 }
 
-/// Inherited type for all objects.
+impl Default for ObjectDesignation {
+    fn default() -> Self {
+        Self::UNKNOWN
+    }
+}
+
+/// Base object type for all trackable entities
 ///
-/// This includes everything from aircrafts, ground units, to any point in space
-/// that can be tracked.
+/// Represents any entity in the simulation: aircraft, ground units,
+/// missiles, waypoints, etc.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Object {
-    // Identification
-    //
-    /// Unique ID assigned to track object
-    pub object_id: Uuid,
+    /// Unique identifier (ULID format)
+    /// Serialized as u128 for efficiency
+    #[serde(with = "ulid_as_u128")]
+    pub object_id: Ulid,
 
-    /// Designated alliance
+    /// Alliance/designation
     pub designation: ObjectDesignation,
 
-    // Position
-    //
-    /// GPS Longitude
+    /// GPS Longitude (decimal degrees)
     pub longitude: f32,
 
-    /// GPS Latitude
+    /// GPS Latitude (decimal degrees)
     pub latitude: f32,
 
-    /// Measured in Feet
+    /// Altitude (feet MSL)
     pub altitude: f32,
 
-    /// Measured in Degrees
+    /// Heading (degrees, 0-360, true north)
     pub heading: f32,
 }
 
 impl Object {
+    /// Create new object with generated ID
     pub fn new(
         designation: ObjectDesignation,
         longitude: f32,
@@ -49,7 +59,7 @@ impl Object {
         heading: f32,
     ) -> Self {
         Self {
-            object_id: Uuid::now_v7(),
+            object_id: Ulid::new(),
             designation,
             longitude,
             latitude,
@@ -57,35 +67,120 @@ impl Object {
             heading,
         }
     }
+
+    /// Create object with specific ID (for deserialization/testing)
+    pub fn with_id(
+        object_id: Ulid,
+        designation: ObjectDesignation,
+        longitude: f32,
+        latitude: f32,
+        altitude: f32,
+        heading: f32,
+    ) -> Self {
+        Self {
+            object_id,
+            designation,
+            longitude,
+            latitude,
+            altitude,
+            heading,
+        }
+    }
+
+    /// Bulk creation of objects (efficient batch allocation)
+    pub fn new_batch(count: usize, designation: ObjectDesignation) -> Vec<Self> {
+        (0..count)
+            .map(|_| Self::new(designation, 0.0, 0.0, 0.0, 0.0))
+            .collect()
+    }
 }
 
-/// Inherited type for all tasks
+/// Task assigned to an object
+///
+/// Represents missions, orders, or objectives assigned to simulation entities.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Task {
-    // Identification
-    //
-    /// Unique ID assigned to track task
-    pub task_id: Uuid,
+    /// Unique task identifier
+    #[serde(with = "ulid_as_u128")]
+    pub task_id: Ulid,
 
-    // Assignment
-    //
-    /// ID of object assigned to carry out task
-    ///
-    /// References the object_id field of an Object.
-    pub assigned_object_id: Uuid,
+    /// ID of object assigned to execute this task
+    #[serde(with = "ulid_as_u128")]
+    pub assigned_object_id: Ulid,
 
-    /// ID of targeted object to carry out task on
-    ///
-    /// Optional - not all tasks have a specific target object.
-    pub target_object_id: Option<Uuid>,
+    /// Optional target object for this task
+    #[serde(with = "option_ulid_as_u128")]
+    pub target_object_id: Option<Ulid>,
 }
 
 impl Task {
-    pub fn new(assigned_object_id: Uuid, target_object_id: Option<Uuid>) -> Self {
+    /// Create new task with generated ID
+    pub fn new(assigned_object_id: Ulid, target_object_id: Option<Ulid>) -> Self {
         Self {
-            task_id: Uuid::now_v7(),
+            task_id: Ulid::new(),
             assigned_object_id,
             target_object_id,
         }
+    }
+
+    /// Create task with specific ID (for deserialization/testing)
+    pub fn with_id(
+        task_id: Ulid,
+        assigned_object_id: Ulid,
+        target_object_id: Option<Ulid>,
+    ) -> Self {
+        Self {
+            task_id,
+            assigned_object_id,
+            target_object_id,
+        }
+    }
+}
+
+// ============================================================================
+// Serialization Helpers
+// ============================================================================
+
+/// Serialize ULID as u128 instead of string (50% smaller, much faster)
+mod ulid_as_u128 {
+    use serde::{Deserialize, Deserializer, Serializer};
+    use ulid::Ulid;
+
+    pub fn serialize<S>(ulid: &Ulid, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_u128(ulid.0)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Ulid, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = u128::deserialize(deserializer)?;
+        Ok(Ulid(value))
+    }
+}
+
+/// Serialize Option<ULID> as Option<u128>
+mod option_ulid_as_u128 {
+    use serde::{Deserialize, Deserializer, Serializer};
+    use ulid::Ulid;
+
+    pub fn serialize<S>(value: &Option<Ulid>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match value {
+            Some(ulid) => serializer.serialize_some(&ulid.0),
+            None => serializer.serialize_none(),
+        }
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<Ulid>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Option::<u128>::deserialize(deserializer).map(|opt| opt.map(Ulid))
     }
 }
