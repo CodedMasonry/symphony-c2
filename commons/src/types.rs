@@ -184,3 +184,46 @@ mod option_ulid_as_u128 {
         Option::<u128>::deserialize(deserializer).map(|opt| opt.map(Ulid))
     }
 }
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
+
+impl Object {
+    /// Update object position
+    pub fn update_position(&mut self, longitude: f32, latitude: f32, altitude: f32) {
+        self.longitude = longitude;
+        self.latitude = latitude;
+        self.altitude = altitude;
+    }
+
+    /// Update object heading
+    pub fn update_heading(&mut self, heading: f32) {
+        self.heading = heading.rem_euclid(360.0);
+    }
+
+    /// Check if object is hostile
+    pub fn is_hostile(&self) -> bool {
+        self.designation == ObjectDesignation::HOSTILE
+    }
+
+    /// Check if object is friendly
+    pub fn is_friendly(&self) -> bool {
+        matches!(
+            self.designation,
+            ObjectDesignation::FRIENDLY | ObjectDesignation::ALLY
+        )
+    }
+}
+
+impl Task {
+    /// Check if task has a target
+    pub fn has_target(&self) -> bool {
+        self.target_object_id.is_some()
+    }
+
+    /// Get target ID if present
+    pub fn get_target(&self) -> Option<Ulid> {
+        self.target_object_id
+    }
+}
