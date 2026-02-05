@@ -590,6 +590,7 @@ dependencies = [
  "serde",
  "typeshare",
  "ulid",
+ "uuid",
 ]
 
 [[package]]
