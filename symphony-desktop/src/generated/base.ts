@@ -2,12 +2,12 @@
 // versions:
 //   protoc-gen-ts_proto  v2.11.2
 //   protoc               v6.33.1
-// source: simulation.proto
+// source: base.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 
-export const protobufPackage = "simulation";
+export const protobufPackage = "base";
 
 /** / Designation/alliance of an object in the simulation. */
 export enum ObjectDesignation {
