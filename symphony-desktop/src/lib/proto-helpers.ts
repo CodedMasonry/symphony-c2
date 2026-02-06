@@ -1,4 +1,4 @@
-import { Object } from "@/generated/simulation";
+import { Object as SimObject } from "@/generated/simulation";
 
 /**
  * Converts Protobuf bytes (Uint8Array) to a standard ULID string.
@@ -22,7 +22,7 @@ export async function loadObject() {
   const binary: Uint8Array = await invoke("get_active_object");
 
   // Decode using the generated Protobuf modules
-  const obj = Object.decode(binary);
+  const obj = SimObject.decode(binary);
 
   console.log(`Object ID: ${bytesToUlid(obj.objectId)}`);
   console.log(`Lat: ${obj.latitude}, Lng: ${obj.longitude}`);
