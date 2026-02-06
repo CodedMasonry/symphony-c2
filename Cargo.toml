@@ -1,7 +1,20 @@
 [workspace]
-members = ["commons", "symphony-conductor", "symphony-desktop/src-tauri"]
+members = ["symphony-types", "symphony-conductor", "symphony-desktop/src-tauri"]
 
 resolver = "2"
+
+[workspace.dependencies]
+prost = "0.14.3"
+prost-build = "0.14.3"
+serde = "1.0.228"
+serde_json = "1"
+tauri = "2"
+tauri-build = "2"
+tauri-plugin-opener = "2"
+tokio = "1.49.0"
+ulid = "1.2.1"
+zenoh = "1.7.2"
+symphony-types = { version = "=0.1.0", path = "symphony-types" }
 
 [profile.dev]
 incremental = true # Compile your binary in smaller steps.

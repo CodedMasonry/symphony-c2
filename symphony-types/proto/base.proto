@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package simulation;
+package base;
 
 /// Designation/alliance of an object in the simulation.
 enum ObjectDesignation {

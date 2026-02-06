@@ -558,16 +558,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "commons"
-version = "0.1.0"
-dependencies = [
- "prost",
- "prost-build",
- "serde",
- "ulid",
-]
-
-[[package]]
 name = "concurrent-queue"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4607,11 +4597,24 @@ dependencies = [
 name = "symphony-desktop"
 version = "0.1.0"
 dependencies = [
+ "prost",
  "serde",
  "serde_json",
+ "symphony-types",
  "tauri",
  "tauri-build",
  "tauri-plugin-opener",
+ "ulid",
+]
+
+[[package]]
+name = "symphony-types"
+version = "0.1.0"
+dependencies = [
+ "prost",
+ "prost-build",
+ "serde",
+ "ulid",
 ]
 
 [[package]]
