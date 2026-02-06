@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package simulation;
+
+/// Designation/alliance of an object in the simulation.
+enum ObjectDesignation {
+  UNKNOWN = 0;
+  HOSTILE = 1;
+  CIVILIAN = 2;
+  ALLY = 3;
+  FRIENDLY = 4;
+}
+
+/// Base entity representing a trackable object (e.g., aircraft, unit).
+message Object {
+  /// Unique identifier (16-byte binary ULID).
+  bytes object_id = 1;
+
+  /// The alliance/designation of the entity.
+  ObjectDesignation designation = 2;
+
+  /// GPS Coordinates & Orientation.
+  float longitude = 3;
+  float latitude = 4;
+  float altitude = 5;
+  float heading = 6;
+}
+
+/// Represents a task or mission assigned to an Object.
+message Task {
+  /// Unique task identifier (16-byte binary ULID).
+  bytes task_id = 1;
+
+  /// The ID of the object performing the task.
+  bytes assigned_object_id = 2;
+
+  /// Optional target for the task.
+  optional bytes target_object_id = 3;
+}
