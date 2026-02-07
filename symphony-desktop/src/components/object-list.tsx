@@ -1,5 +1,5 @@
 // components/LeftSidebar.tsx
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getDesignationName } from "@/lib/proto_api";
 import { ObjectDesignation } from "@/lib/generated/base";
@@ -7,10 +7,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { useObjectsStore } from "@/lib/stores/objectsStore";
 import {
   Compass01Icon,
+  Filter,
   LoaderCircle,
   MapPin,
   Refresh,
@@ -18,7 +27,22 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 
 function LeftSidebar({ className, ...props }: React.ComponentProps<"div">) {
+  // Hooks
+  const [selectedDesignations, setSelectedDesignations] = useState<
+    ObjectDesignation[]
+  >([
+    ObjectDesignation.OBJECT_DESIGNATION_HOSTILE,
+    ObjectDesignation.OBJECT_DESIGNATION_FRIENDLY,
+    ObjectDesignation.OBJECT_DESIGNATION_ALLY,
+    ObjectDesignation.OBJECT_DESIGNATION_CIVILIAN,
+    ObjectDesignation.OBJECT_DESIGNATION_UNSPECIFIED,
+  ]);
+  // Object Store
   const objects = useObjectsStore((state) => state.objects);
+  const filteredObjects = objects.filter((obj) =>
+    selectedDesignations.includes(obj.designation),
+  );
+  // States
   const loading = useObjectsStore((state) => state.loading);
   const error = useObjectsStore((state) => state.error);
   const loadObjects = useObjectsStore((state) => state.loadObjects);
@@ -27,6 +51,18 @@ function LeftSidebar({ className, ...props }: React.ComponentProps<"div">) {
     loadObjects();
   }, [loadObjects]);
 
+  const toggleDesignation = (designation: ObjectDesignation) => {
+    setSelectedDesignations((prev) =>
+      prev.includes(designation)
+        ? prev.filter((d) => d !== designation)
+        : [...prev, designation],
+    );
+  };
+
+  const isChecked = (designation: ObjectDesignation) => {
+    return selectedDesignations.includes(designation);
+  };
+
   return (
     <div
       className={cn("flex flex-col h-full bg-background", className)}
@@ -34,7 +70,8 @@ function LeftSidebar({ className, ...props }: React.ComponentProps<"div">) {
     >
       {/* Header */}
       <div className="p-4 border-b">
-        <div className="flex items-center justify-between">
+        {/* Top Section */}
+        <div className="flex items-center justify-between pb-2">
           <div>
             <h2 className="text-lg font-semibold">Objects</h2>
             <p className="text-sm text-muted-foreground">
@@ -54,6 +91,106 @@ function LeftSidebar({ className, ...props }: React.ComponentProps<"div">) {
             />
           </Button>
         </div>
+
+        {/* Filter Selection */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <HugeiconsIcon
+                icon={Filter}
+                strokeWidth={2}
+                className="h-4 w-4 mr-2"
+              />
+              Filter ({selectedDesignations.length})
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-48">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Object Types</DropdownMenuLabel>
+              <DropdownMenuCheckboxItem
+                checked={isChecked(
+                  ObjectDesignation.OBJECT_DESIGNATION_HOSTILE,
+                )}
+                onCheckedChange={() =>
+                  toggleDesignation(
+                    ObjectDesignation.OBJECT_DESIGNATION_HOSTILE,
+                  )
+                }
+              >
+                <span className="text-destructive">●</span>
+                <span className="ml-2">
+                  {getDesignationName(
+                    ObjectDesignation.OBJECT_DESIGNATION_HOSTILE,
+                  )}
+                </span>
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={isChecked(
+                  ObjectDesignation.OBJECT_DESIGNATION_FRIENDLY,
+                )}
+                onCheckedChange={() =>
+                  toggleDesignation(
+                    ObjectDesignation.OBJECT_DESIGNATION_FRIENDLY,
+                  )
+                }
+              >
+                <span className="text-blue-400">●</span>
+                <span className="ml-2">
+                  {getDesignationName(
+                    ObjectDesignation.OBJECT_DESIGNATION_FRIENDLY,
+                  )}
+                </span>
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={isChecked(ObjectDesignation.OBJECT_DESIGNATION_ALLY)}
+                onCheckedChange={() =>
+                  toggleDesignation(ObjectDesignation.OBJECT_DESIGNATION_ALLY)
+                }
+              >
+                <span className="text-blue-400">●</span>
+                <span className="ml-2">
+                  {getDesignationName(
+                    ObjectDesignation.OBJECT_DESIGNATION_ALLY,
+                  )}
+                </span>
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={isChecked(
+                  ObjectDesignation.OBJECT_DESIGNATION_CIVILIAN,
+                )}
+                onCheckedChange={() =>
+                  toggleDesignation(
+                    ObjectDesignation.OBJECT_DESIGNATION_CIVILIAN,
+                  )
+                }
+              >
+                <span className="text-gray-400">●</span>
+                <span className="ml-2">
+                  {getDesignationName(
+                    ObjectDesignation.OBJECT_DESIGNATION_CIVILIAN,
+                  )}
+                </span>
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={isChecked(
+                  ObjectDesignation.OBJECT_DESIGNATION_UNSPECIFIED,
+                )}
+                onCheckedChange={() =>
+                  toggleDesignation(
+                    ObjectDesignation.OBJECT_DESIGNATION_UNSPECIFIED,
+                  )
+                }
+              >
+                <span className="text-muted-foreground">●</span>
+                <span className="ml-2">
+                  {getDesignationName(
+                    ObjectDesignation.OBJECT_DESIGNATION_UNSPECIFIED,
+                  )}
+                </span>
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Content */}
@@ -85,7 +222,7 @@ function LeftSidebar({ className, ...props }: React.ComponentProps<"div">) {
               <p className="text-sm">No objects found</p>
             </div>
           ) : (
-            objects.map((obj) => (
+            filteredObjects.map((obj) => (
               <Card
                 key={obj.ulidString}
                 className="bg-accent/20 hover:bg-accent/40 transition-colors cursor-pointer"

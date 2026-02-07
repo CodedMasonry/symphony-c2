@@ -13,8 +13,10 @@ pub struct Object {
     pub longitude: f32,
     #[prost(float, tag = "4")]
     pub latitude: f32,
+    /// / Measured as MSL
     #[prost(float, tag = "5")]
     pub altitude: f32,
+    /// / Measued in degrees
     #[prost(float, tag = "6")]
     pub heading: f32,
 }

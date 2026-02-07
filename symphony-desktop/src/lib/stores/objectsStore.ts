@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { fetchObjects, ObjectWithUlid } from "@/lib/proto_api";
+import { ObjectDesignation } from "../generated/base";
 
 interface ObjectsStore {
   // State
@@ -20,7 +21,10 @@ interface ObjectsStore {
 
   // Selectors (optional helpers)
   getObjectByUlid: (ulid: string) => ObjectWithUlid | undefined;
-  getObjectsByDesignation: (designation: number) => ObjectWithUlid[];
+  getObjectsByDesignation: (designation: ObjectDesignation) => ObjectWithUlid[];
+  getObjectsByDesignationList: (
+    designation: ObjectDesignation[],
+  ) => ObjectWithUlid[];
 }
 
 export const useObjectsStore = create<ObjectsStore>()(
@@ -120,13 +124,20 @@ export const useObjectsStore = create<ObjectsStore>()(
       clearError: () => set({ error: null }),
 
       // Helper: Get single object by ULID
-      getObjectByUlid: (ulid) => {
+      getObjectByUlid: (ulid: string) => {
         return get().objectsById.get(ulid);
       },
 
       // Helper: Filter objects by designation
-      getObjectsByDesignation: (designation) => {
+      getObjectsByDesignation: (designation: ObjectDesignation) => {
         return get().objects.filter((obj) => obj.designation === designation);
+      },
+
+      // Helper: Filter objects by array of designation
+      getObjectsByDesignationList: (designationList: ObjectDesignation[]) => {
+        return get().objects.filter((obj) =>
+          designationList.includes(obj.designation),
+        );
       },
     }),
     { name: "objects-store" }, // For Redux DevTools

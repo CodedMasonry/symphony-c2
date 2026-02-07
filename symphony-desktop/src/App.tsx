@@ -1,5 +1,5 @@
 import CesiumMap from "@/map/cesium-map";
-import { LeftSidebar } from "./components/left-sidebar";
+import { LeftSidebar } from "./components/object-list";
 import { RightSideBar } from "./components/right-sidebar";
 import { TopBar } from "./components/top-bar";
 
