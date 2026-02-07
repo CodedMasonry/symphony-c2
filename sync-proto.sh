@@ -1,7 +1,7 @@
 #!/bin/bash
 # 1. Sync Rust (Commons)
 echo "Generating Rust types..."
-cd commons && cargo build && cd ..
+cd symphony-types && cargo build && cd ..
 
 # 2. Sync TypeScript (Desktop)
 echo "Generating TypeScript types..."

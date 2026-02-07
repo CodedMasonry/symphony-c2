@@ -11,31 +11,31 @@ export const protobufPackage = "base";
 
 /** / Designation/alliance of an object in the simulation. */
 export enum ObjectDesignation {
-  UNKNOWN = 0,
-  HOSTILE = 1,
-  CIVILIAN = 2,
-  ALLY = 3,
-  FRIENDLY = 4,
+  OBJECT_DESIGNATION_UNSPECIFIED = 0,
+  OBJECT_DESIGNATION_HOSTILE = 1,
+  OBJECT_DESIGNATION_CIVILIAN = 2,
+  OBJECT_DESIGNATION_ALLY = 3,
+  OBJECT_DESIGNATION_FRIENDLY = 4,
   UNRECOGNIZED = -1,
 }
 
 export function objectDesignationFromJSON(object: any): ObjectDesignation {
   switch (object) {
     case 0:
-    case "UNKNOWN":
-      return ObjectDesignation.UNKNOWN;
+    case "OBJECT_DESIGNATION_UNSPECIFIED":
+      return ObjectDesignation.OBJECT_DESIGNATION_UNSPECIFIED;
     case 1:
-    case "HOSTILE":
-      return ObjectDesignation.HOSTILE;
+    case "OBJECT_DESIGNATION_HOSTILE":
+      return ObjectDesignation.OBJECT_DESIGNATION_HOSTILE;
     case 2:
-    case "CIVILIAN":
-      return ObjectDesignation.CIVILIAN;
+    case "OBJECT_DESIGNATION_CIVILIAN":
+      return ObjectDesignation.OBJECT_DESIGNATION_CIVILIAN;
     case 3:
-    case "ALLY":
-      return ObjectDesignation.ALLY;
+    case "OBJECT_DESIGNATION_ALLY":
+      return ObjectDesignation.OBJECT_DESIGNATION_ALLY;
     case 4:
-    case "FRIENDLY":
-      return ObjectDesignation.FRIENDLY;
+    case "OBJECT_DESIGNATION_FRIENDLY":
+      return ObjectDesignation.OBJECT_DESIGNATION_FRIENDLY;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -45,16 +45,16 @@ export function objectDesignationFromJSON(object: any): ObjectDesignation {
 
 export function objectDesignationToJSON(object: ObjectDesignation): string {
   switch (object) {
-    case ObjectDesignation.UNKNOWN:
-      return "UNKNOWN";
-    case ObjectDesignation.HOSTILE:
-      return "HOSTILE";
-    case ObjectDesignation.CIVILIAN:
-      return "CIVILIAN";
-    case ObjectDesignation.ALLY:
-      return "ALLY";
-    case ObjectDesignation.FRIENDLY:
-      return "FRIENDLY";
+    case ObjectDesignation.OBJECT_DESIGNATION_UNSPECIFIED:
+      return "OBJECT_DESIGNATION_UNSPECIFIED";
+    case ObjectDesignation.OBJECT_DESIGNATION_HOSTILE:
+      return "OBJECT_DESIGNATION_HOSTILE";
+    case ObjectDesignation.OBJECT_DESIGNATION_CIVILIAN:
+      return "OBJECT_DESIGNATION_CIVILIAN";
+    case ObjectDesignation.OBJECT_DESIGNATION_ALLY:
+      return "OBJECT_DESIGNATION_ALLY";
+    case ObjectDesignation.OBJECT_DESIGNATION_FRIENDLY:
+      return "OBJECT_DESIGNATION_FRIENDLY";
     case ObjectDesignation.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -82,6 +82,10 @@ export interface Task {
   assignedObjectId: Uint8Array;
   /** / Optional target for the task. */
   targetObjectId?: Uint8Array | undefined;
+}
+
+export interface ObjectList {
+  objects: Object[];
 }
 
 function createBaseObject(): Object {
@@ -328,6 +332,66 @@ export const Task: MessageFns<Task> = {
     message.taskId = object.taskId ?? new Uint8Array(0);
     message.assignedObjectId = object.assignedObjectId ?? new Uint8Array(0);
     message.targetObjectId = object.targetObjectId ?? undefined;
+    return message;
+  },
+};
+
+function createBaseObjectList(): ObjectList {
+  return { objects: [] };
+}
+
+export const ObjectList: MessageFns<ObjectList> = {
+  encode(message: ObjectList, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.objects) {
+      Object.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ObjectList {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseObjectList();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.objects.push(Object.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ObjectList {
+    return {
+      objects: globalThis.Array.isArray(object?.objects) ? object.objects.map((e: any) => Object.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: ObjectList): unknown {
+    const obj: any = {};
+    if (message.objects?.length) {
+      obj.objects = message.objects.map((e) => Object.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ObjectList>, I>>(base?: I): ObjectList {
+    return ObjectList.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ObjectList>, I>>(object: I): ObjectList {
+    const message = createBaseObjectList();
+    message.objects = object.objects?.map((e) => Object.fromPartial(e)) || [];
     return message;
   },
 };

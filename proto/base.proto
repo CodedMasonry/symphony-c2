@@ -4,11 +4,11 @@ package base;
 
 /// Designation/alliance of an object in the simulation.
 enum ObjectDesignation {
-  UNKNOWN = 0;
-  HOSTILE = 1;
-  CIVILIAN = 2;
-  ALLY = 3;
-  FRIENDLY = 4;
+  OBJECT_DESIGNATION_UNSPECIFIED = 0;
+  OBJECT_DESIGNATION_HOSTILE = 1;
+  OBJECT_DESIGNATION_CIVILIAN = 2;
+  OBJECT_DESIGNATION_ALLY = 3;
+  OBJECT_DESIGNATION_FRIENDLY = 4;
 }
 
 /// Base entity representing a trackable object (e.g., aircraft, unit).
@@ -36,4 +36,8 @@ message Task {
 
   /// Optional target for the task.
   optional bytes target_object_id = 3;
+}
+
+message ObjectList {
+  repeated Object objects = 1;
 }

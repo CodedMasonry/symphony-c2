@@ -31,11 +31,16 @@ pub struct Task {
     #[prost(bytes = "vec", optional, tag = "3")]
     pub target_object_id: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
 }
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ObjectList {
+    #[prost(message, repeated, tag = "1")]
+    pub objects: ::prost::alloc::vec::Vec<Object>,
+}
 /// / Designation/alliance of an object in the simulation.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum ObjectDesignation {
-    Unknown = 0,
+    Unspecified = 0,
     Hostile = 1,
     Civilian = 2,
     Ally = 3,
@@ -48,21 +53,21 @@ impl ObjectDesignation {
     /// (if the ProtoBuf definition does not change) and safe for programmatic use.
     pub fn as_str_name(&self) -> &'static str {
         match self {
-            Self::Unknown => "UNKNOWN",
-            Self::Hostile => "HOSTILE",
-            Self::Civilian => "CIVILIAN",
-            Self::Ally => "ALLY",
-            Self::Friendly => "FRIENDLY",
+            Self::Unspecified => "OBJECT_DESIGNATION_UNSPECIFIED",
+            Self::Hostile => "OBJECT_DESIGNATION_HOSTILE",
+            Self::Civilian => "OBJECT_DESIGNATION_CIVILIAN",
+            Self::Ally => "OBJECT_DESIGNATION_ALLY",
+            Self::Friendly => "OBJECT_DESIGNATION_FRIENDLY",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
     pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
         match value {
-            "UNKNOWN" => Some(Self::Unknown),
-            "HOSTILE" => Some(Self::Hostile),
-            "CIVILIAN" => Some(Self::Civilian),
-            "ALLY" => Some(Self::Ally),
-            "FRIENDLY" => Some(Self::Friendly),
+            "OBJECT_DESIGNATION_UNSPECIFIED" => Some(Self::Unspecified),
+            "OBJECT_DESIGNATION_HOSTILE" => Some(Self::Hostile),
+            "OBJECT_DESIGNATION_CIVILIAN" => Some(Self::Civilian),
+            "OBJECT_DESIGNATION_ALLY" => Some(Self::Ally),
+            "OBJECT_DESIGNATION_FRIENDLY" => Some(Self::Friendly),
             _ => None,
         }
     }

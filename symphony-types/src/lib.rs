@@ -3,7 +3,7 @@ pub mod base {
     include!("../generated/base.rs");
 }
 
-use simulation::{Object, Task};
+use base::{Object, Task};
 use ulid::Ulid;
 
 /// Extension trait to provide seamless ULID support for Protobuf messages.

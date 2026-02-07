@@ -19,7 +19,7 @@ import {
   SettingsIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { getCurrentWindow } from "@tauri-apps/api/src/window";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 function TopBar({ className, ...props }: React.ComponentProps<"div">) {
   const appWindow = getCurrentWindow();
