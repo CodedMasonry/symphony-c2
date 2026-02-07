@@ -38,14 +38,14 @@ export function ObjectListSidebar({
   return (
     <div
       className={cn(
-        "absolute top-4 bottom-4 left-4 z-20 transition-transform duration-300 ease-in-out",
+        "absolute top-4 bottom-4 left-4 z-30 transition-transform duration-300 ease-in-out",
         !isOpen && "-translate-x-90",
         className,
       )}
       {...props}
     >
       {/* Main Sidebar Panel */}
-      <div className="flex flex-col h-full w-80 bg-background/95 backdrop-blur shadow-2xl rounded-xl border-2 border-border overflow-hidden">
+      <div className="flex flex-col h-full w-80 bg-background/95 border-2 border-border/95 overflow-hidden">
         <SidebarHeader
           objectCount={objects.length}
           filteredCount={filteredCount}
