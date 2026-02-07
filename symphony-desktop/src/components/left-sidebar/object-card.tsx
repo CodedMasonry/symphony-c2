@@ -26,7 +26,7 @@ interface ObjectCardProps {
 
 export function ObjectCard({ object }: ObjectCardProps) {
   return (
-    <Card className="bg-accent/20 hover:bg-accent/40 transition-colors cursor-pointer">
+    <Card className="bg-accent/20 hover:bg-accent/40 transition-colors cursor-default">
       <CardHeader>
         <div className="flex items-start justify-between">
           <CardTitle className="text-sm font-medium">

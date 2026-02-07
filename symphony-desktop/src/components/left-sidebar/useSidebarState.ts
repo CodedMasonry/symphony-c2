@@ -1,9 +1,15 @@
+// components/LeftSidebar/useSidebarState.ts
 import { useState, useMemo } from "react";
 import { ObjectDesignation } from "@/lib/generated/base";
 import { DEFAULT_SELECTED_DESIGNATIONS } from "./constants";
 
 interface ObjectType {
+  ulidString: string;
   designation: ObjectDesignation;
+  latitude: number;
+  longitude: number;
+  heading: number;
+  altitude: number;
   createdAt: Date;
 }
 
@@ -14,7 +20,9 @@ export function useSidebarState(objects: ObjectType[]) {
 
   const [collapsedSections, setCollapsedSections] = useState<
     Set<ObjectDesignation>
-  >(new Set());
+  >(new Set(DEFAULT_SELECTED_DESIGNATIONS));
+
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const toggleDesignation = (designation: ObjectDesignation) => {
     setSelectedDesignations((prev) =>
@@ -44,9 +52,33 @@ export function useSidebarState(objects: ObjectType[]) {
     return !collapsedSections.has(designation);
   };
 
+  // Filter objects by search query
+  const filteredObjects = useMemo(() => {
+    if (!searchQuery.trim()) return objects;
+
+    const lowerQuery = searchQuery.toLowerCase().trim();
+
+    return objects.filter((obj) => {
+      // Search by ULID
+      if (obj.ulidString.toLowerCase().includes(lowerQuery)) return true;
+
+      // Search by coordinates (latitude, longitude)
+      if (obj.latitude.toString().includes(lowerQuery)) return true;
+      if (obj.longitude.toString().includes(lowerQuery)) return true;
+
+      // Search by altitude
+      if (obj.altitude.toString().includes(lowerQuery)) return true;
+
+      // Search by heading
+      if (obj.heading.toString().includes(lowerQuery)) return true;
+
+      return false;
+    });
+  }, [objects, searchQuery]);
+
   // Group and sort objects by designation
   const groupedObjects = useMemo(() => {
-    const sortedObjects = [...objects].sort(
+    const sortedObjects = [...filteredObjects].sort(
       (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
     );
 
@@ -60,15 +92,18 @@ export function useSidebarState(objects: ObjectType[]) {
     });
 
     return groups;
-  }, [objects]);
+  }, [filteredObjects]);
 
   return {
     selectedDesignations,
     collapsedSections,
+    searchQuery,
+    setSearchQuery,
     toggleDesignation,
     isDesignationChecked,
     toggleSection,
     isSectionOpen,
     groupedObjects,
+    filteredCount: filteredObjects.length,
   };
 }

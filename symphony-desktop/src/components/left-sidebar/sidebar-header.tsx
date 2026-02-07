@@ -3,11 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Refresh } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { DesignationFilter } from "./designation-filter";
+import { SearchBar } from "./searchbar";
 import { ObjectDesignation } from "@/lib/generated/base";
 
 interface SidebarHeaderProps {
   objectCount: number;
+  filteredCount: number;
   loading: boolean;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
   onRefresh: () => void;
   onToggleDesignation: (designation: ObjectDesignation) => void;
   isDesignationChecked: (designation: ObjectDesignation) => boolean;
@@ -15,17 +19,24 @@ interface SidebarHeaderProps {
 
 export function SidebarHeader({
   objectCount,
+  filteredCount,
   loading,
+  searchQuery,
+  onSearchChange,
   onRefresh,
   onToggleDesignation,
   isDesignationChecked,
 }: SidebarHeaderProps) {
   return (
-    <div className="p-4 border-b">
-      <div className="flex items-center justify-between pb-2">
+    <div className="p-4 border-b space-y-3">
+      <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold">Objects</h2>
-          <p className="text-sm text-muted-foreground">{objectCount} active</p>
+          <p className="text-sm text-muted-foreground">
+            {searchQuery
+              ? `${filteredCount} of ${objectCount}`
+              : `${objectCount} active`}
+          </p>
         </div>
         <Button
           variant="ghost"
@@ -40,6 +51,12 @@ export function SidebarHeader({
           />
         </Button>
       </div>
+
+      <SearchBar
+        value={searchQuery}
+        onChange={onSearchChange}
+        placeholder="Search ULID, coordinates..."
+      />
 
       <DesignationFilter
         onToggleDesignation={onToggleDesignation}

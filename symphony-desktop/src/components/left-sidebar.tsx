@@ -17,11 +17,14 @@ export function ObjectListSidebar({
 
   const {
     selectedDesignations,
+    searchQuery,
+    setSearchQuery,
     toggleDesignation,
     isDesignationChecked,
     toggleSection,
     isSectionOpen,
     groupedObjects,
+    filteredCount,
   } = useSidebarState(objects);
 
   useEffect(() => {
@@ -35,7 +38,10 @@ export function ObjectListSidebar({
     >
       <SidebarHeader
         objectCount={objects.length}
+        filteredCount={filteredCount}
         loading={loading}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
         onRefresh={loadObjects}
         onToggleDesignation={toggleDesignation}
         isDesignationChecked={isDesignationChecked}
