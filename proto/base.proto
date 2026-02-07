@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package base;
 
 /// Designation/alliance of an object in the simulation.
