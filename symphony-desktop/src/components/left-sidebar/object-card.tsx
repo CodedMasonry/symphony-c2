@@ -40,7 +40,11 @@ export function ObjectCard({ object }: ObjectCardProps) {
           </Badge>
         </div>
         <code className="text-xs text-muted-foreground font-mono">
-          {object.ulidString.slice(0, 13)}...
+          {object.ulidString.slice(0, 6)}...
+          {object.ulidString.slice(
+            object.ulidString.length - 6,
+            object.ulidString.length,
+          )}
         </code>
       </CardHeader>
       <CardContent className="space-y-2">
