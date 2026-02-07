@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ObjectDesignation } from "@/lib/generated/base";
+import { ObjectDesignation } from "@/generated/base";
 import { DesignationSection } from "./designation-section";
 import { DESIGNATION_ORDER } from "./constants";
 

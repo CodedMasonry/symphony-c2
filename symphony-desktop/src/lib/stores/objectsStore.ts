@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { fetchObjects, ObjectWithUlid } from "@/lib/proto_api";
-import { ObjectDesignation } from "../generated/base";
+import { ObjectDesignation } from "@/generated/base";
 
 interface ObjectsStore {
   // State

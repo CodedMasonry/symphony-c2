@@ -1,4 +1,4 @@
-import { ObjectDesignation } from "@/lib/generated/base";
+import { ObjectDesignation } from "@/generated/base";
 import { DESIGNATION_CONFIG } from "./constants";
 
 type DesignationConfigKey = keyof typeof DESIGNATION_CONFIG;
@@ -27,9 +27,9 @@ export function getDesignationIndicatorColor(
   return config?.indicatorColor ?? "text-muted-foreground";
 }
 
-export function formatTimestamp(date: Date): string {
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
+export function formatTimestamp(timestamp: number): string {
+  const now = Date.now();
+  const diff = now - timestamp * 1000; // Convert Unix timestamp to milliseconds
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);

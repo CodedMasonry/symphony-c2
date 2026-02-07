@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Filter } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ObjectDesignation } from "@/lib/generated/base";
+import { ObjectDesignation } from "@/generated/base";
 import { getDesignationName } from "@/lib/proto_api";
 import { DESIGNATION_ORDER } from "./constants";
 import { getDesignationIndicatorColor } from "./utils";

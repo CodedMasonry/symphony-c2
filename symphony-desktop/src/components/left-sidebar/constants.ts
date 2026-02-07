@@ -1,4 +1,4 @@
-import { ObjectDesignation } from "@/lib/generated/base";
+import { ObjectDesignation } from "@/generated/base";
 
 export const DESIGNATION_ORDER: ObjectDesignation[] = [
   ObjectDesignation.OBJECT_DESIGNATION_HOSTILE,

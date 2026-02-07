@@ -12,7 +12,7 @@ interface SearchBarProps {
 export function SearchBar({
   value,
   onChange,
-  placeholder = "Search objects...",
+  placeholder = "Search callsign, model, unit...",
 }: SearchBarProps) {
   return (
     <div className="relative">

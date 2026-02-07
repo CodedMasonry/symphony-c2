@@ -1,5 +1,4 @@
 syntax = "proto3";
-
 package base;
 
 /// Designation/alliance of an object in the simulation.
@@ -11,6 +10,30 @@ enum ObjectDesignation {
   OBJECT_DESIGNATION_FRIENDLY = 4;
 }
 
+/// Type classification for objects in the simulation.
+enum ObjectType {
+  OBJECT_TYPE_UNSPECIFIED = 0;
+  OBJECT_TYPE_FIXED_WING = 1; // Fighter jets, bombers, transport aircraft
+  OBJECT_TYPE_ROTARY_WING = 2; // Helicopters
+  OBJECT_TYPE_GROUND_VEHICLE = 3; // Tanks, APCs, trucks
+  OBJECT_TYPE_NAVAL = 4; // Ships, boats
+  OBJECT_TYPE_INFANTRY = 5; // Ground troops
+  OBJECT_TYPE_UAV = 6; // Unmanned aerial vehicles
+  OBJECT_TYPE_MISSILE = 7; // Missiles, rockets
+  OBJECT_TYPE_STRUCTURE = 8; // Buildings, installations
+}
+
+/// Operational status of an object.
+enum ObjectStatus {
+  OBJECT_STATUS_UNSPECIFIED = 0;
+  OBJECT_STATUS_ACTIVE = 1; // Operational and mission-capable
+  OBJECT_STATUS_DAMAGED = 2; // Partially functional
+  OBJECT_STATUS_DESTROYED = 3; // Non-functional
+  OBJECT_STATUS_RETURNING = 4; // Returning to base
+  OBJECT_STATUS_STANDBY = 5; // On standby/idle
+  OBJECT_STATUS_ENGAGED = 6; // Currently in combat
+}
+
 /// Base entity representing a trackable object (e.g., aircraft, unit).
 message Object {
   /// Unique identifier (16-byte binary ULID).
@@ -19,13 +42,67 @@ message Object {
   /// The alliance/designation of the entity.
   ObjectDesignation designation = 2;
 
+  /// Type classification (aircraft, ground unit, etc.)
+  ObjectType type = 3;
+
   /// GPS Coordinates & Orientation.
-  float longitude = 3;
-  float latitude = 4;
-  /// Measured as MSL
-  float altitude = 5;
-  /// Measued in degrees
-  float heading = 6;
+  float longitude = 4;
+  float latitude = 5;
+
+  /// Measured as MSL (Mean Sea Level) in feet
+  float altitude = 6;
+
+  /// Measured in degrees (0-360)
+  float heading = 7;
+
+  /// Velocity & Movement
+  /// Speed in knots
+  optional float speed = 8;
+
+  /// Vertical speed (climb/descent rate) in feet per minute
+  optional float vertical_speed = 9;
+
+  /// Operational Data
+  /// Current operational status
+  ObjectStatus status = 10;
+
+  /// Fuel remaining as percentage (0-100)
+  optional float fuel_percentage = 11;
+
+  /// Ammunition/weapons remaining as percentage (0-100)
+  optional float ammo_percentage = 12;
+
+  /// Identification & Metadata
+  /// Human-readable name/callsign (e.g., "Eagle-1", "Tank-Alpha-3")
+  optional string callsign = 13;
+
+  /// Model/class identifier (e.g., "F-16C", "M1A2 Abrams", "AH-64 Apache")
+  optional string model = 14;
+
+  /// Unit or squadron this object belongs to
+  optional string unit = 15;
+
+  /// Timestamps
+  /// When this object was created/spawned in the simulation (Unix timestamp)
+  int64 created_at = 16;
+
+  /// Last time this object's data was updated (Unix timestamp)
+  int64 updated_at = 17;
+
+  /// Mission & Task Data
+  /// Current task ID if assigned
+  optional bytes current_task_id = 18;
+
+  /// Home base or spawn location
+  optional Location home_base = 19;
+}
+
+/// Represents a geographic location.
+message Location {
+  float longitude = 1;
+  float latitude = 2;
+  optional float altitude = 3;
+  optional string name = 4; // e.g., "Nellis AFB", "Forward Operating Base Alpha"
 }
 
 /// Represents a task or mission assigned to an Object.
@@ -38,6 +115,17 @@ message Task {
 
   /// Optional target for the task.
   optional bytes target_object_id = 3;
+
+  /// Task type/description
+  optional string task_type = 4; // e.g., "CAP", "CAS", "Strike", "Transport"
+
+  /// Task priority (1-10, higher is more important)
+  optional int32 priority = 5;
+
+  /// Timestamps
+  int64 created_at = 6;
+  optional int64 started_at = 7;
+  optional int64 completed_at = 8;
 }
 
 message ObjectList {

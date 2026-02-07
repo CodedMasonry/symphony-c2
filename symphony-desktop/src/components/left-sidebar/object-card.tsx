@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Compass01Icon, MapPin } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ObjectDesignation } from "@/lib/generated/base";
+import { Object as ProtoObject } from "@/generated/base";
 import { getDesignationName } from "@/lib/proto_api";
 import {
   getDesignationVariant,
@@ -13,15 +13,7 @@ import {
 } from "./utils";
 
 interface ObjectCardProps {
-  object: {
-    ulidString: string;
-    designation: ObjectDesignation;
-    latitude: number;
-    longitude: number;
-    heading: number;
-    altitude: number;
-    createdAt: Date;
-  };
+  object: ProtoObject & { ulidString: string };
 }
 
 export function ObjectCard({ object }: ObjectCardProps) {
@@ -30,7 +22,7 @@ export function ObjectCard({ object }: ObjectCardProps) {
       <CardHeader>
         <div className="flex items-start justify-between">
           <CardTitle className="text-sm font-medium">
-            {getDesignationName(object.designation)}
+            {object.callsign || getDesignationName(object.designation)}
           </CardTitle>
           <Badge
             variant={getDesignationVariant(object.designation)}
@@ -39,13 +31,18 @@ export function ObjectCard({ object }: ObjectCardProps) {
             {getDesignationBadge(object.designation)}
           </Badge>
         </div>
-        <code className="text-xs text-muted-foreground font-mono">
-          {object.ulidString.slice(0, 6)}...
-          {object.ulidString.slice(
-            object.ulidString.length - 6,
-            object.ulidString.length,
+        <div className="space-y-1">
+          {object.model && (
+            <p className="text-xs text-muted-foreground">{object.model}</p>
           )}
-        </code>
+          <code className="text-xs text-muted-foreground font-mono">
+            {object.ulidString.slice(0, 6)}...
+            {object.ulidString.slice(
+              object.ulidString.length - 6,
+              object.ulidString.length,
+            )}
+          </code>
+        </div>
       </CardHeader>
       <CardContent className="space-y-2">
         <div className="flex items-center text-xs text-muted-foreground">

@@ -4,7 +4,7 @@ import { Refresh } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { DesignationFilter } from "./designation-filter";
 import { SearchBar } from "./searchbar";
-import { ObjectDesignation } from "@/lib/generated/base";
+import { ObjectDesignation } from "@/generated/base";
 
 interface SidebarHeaderProps {
   objectCount: number;

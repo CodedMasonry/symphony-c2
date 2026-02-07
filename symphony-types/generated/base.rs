@@ -8,17 +8,74 @@ pub struct Object {
     /// / The alliance/designation of the entity.
     #[prost(enumeration = "ObjectDesignation", tag = "2")]
     pub designation: i32,
+    /// / Type classification (aircraft, ground unit, etc.)
+    #[prost(enumeration = "ObjectType", tag = "3")]
+    pub r#type: i32,
     /// / GPS Coordinates & Orientation.
-    #[prost(float, tag = "3")]
-    pub longitude: f32,
     #[prost(float, tag = "4")]
-    pub latitude: f32,
-    /// / Measured as MSL
+    pub longitude: f32,
     #[prost(float, tag = "5")]
-    pub altitude: f32,
-    /// / Measued in degrees
+    pub latitude: f32,
+    /// / Measured as MSL (Mean Sea Level) in feet
     #[prost(float, tag = "6")]
+    pub altitude: f32,
+    /// / Measured in degrees (0-360)
+    #[prost(float, tag = "7")]
     pub heading: f32,
+    /// / Velocity & Movement
+    /// / Speed in knots
+    #[prost(float, optional, tag = "8")]
+    pub speed: ::core::option::Option<f32>,
+    /// / Vertical speed (climb/descent rate) in feet per minute
+    #[prost(float, optional, tag = "9")]
+    pub vertical_speed: ::core::option::Option<f32>,
+    /// / Operational Data
+    /// / Current operational status
+    #[prost(enumeration = "ObjectStatus", tag = "10")]
+    pub status: i32,
+    /// / Fuel remaining as percentage (0-100)
+    #[prost(float, optional, tag = "11")]
+    pub fuel_percentage: ::core::option::Option<f32>,
+    /// / Ammunition/weapons remaining as percentage (0-100)
+    #[prost(float, optional, tag = "12")]
+    pub ammo_percentage: ::core::option::Option<f32>,
+    /// / Identification & Metadata
+    /// / Human-readable name/callsign (e.g., "Eagle-1", "Tank-Alpha-3")
+    #[prost(string, optional, tag = "13")]
+    pub callsign: ::core::option::Option<::prost::alloc::string::String>,
+    /// / Model/class identifier (e.g., "F-16C", "M1A2 Abrams", "AH-64 Apache")
+    #[prost(string, optional, tag = "14")]
+    pub model: ::core::option::Option<::prost::alloc::string::String>,
+    /// / Unit or squadron this object belongs to
+    #[prost(string, optional, tag = "15")]
+    pub unit: ::core::option::Option<::prost::alloc::string::String>,
+    /// / Timestamps
+    /// / When this object was created/spawned in the simulation (Unix timestamp)
+    #[prost(int64, tag = "16")]
+    pub created_at: i64,
+    /// / Last time this object's data was updated (Unix timestamp)
+    #[prost(int64, tag = "17")]
+    pub updated_at: i64,
+    /// / Mission & Task Data
+    /// / Current task ID if assigned
+    #[prost(bytes = "vec", optional, tag = "18")]
+    pub current_task_id: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
+    /// / Home base or spawn location
+    #[prost(message, optional, tag = "19")]
+    pub home_base: ::core::option::Option<Location>,
+}
+/// / Represents a geographic location.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Location {
+    #[prost(float, tag = "1")]
+    pub longitude: f32,
+    #[prost(float, tag = "2")]
+    pub latitude: f32,
+    #[prost(float, optional, tag = "3")]
+    pub altitude: ::core::option::Option<f32>,
+    /// e.g., "Nellis AFB", "Forward Operating Base Alpha"
+    #[prost(string, optional, tag = "4")]
+    pub name: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// / Represents a task or mission assigned to an Object.
 #[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
@@ -32,6 +89,21 @@ pub struct Task {
     /// / Optional target for the task.
     #[prost(bytes = "vec", optional, tag = "3")]
     pub target_object_id: ::core::option::Option<::prost::alloc::vec::Vec<u8>>,
+    /// / Task type/description
+    ///
+    /// e.g., "CAP", "CAS", "Strike", "Transport"
+    #[prost(string, optional, tag = "4")]
+    pub task_type: ::core::option::Option<::prost::alloc::string::String>,
+    /// / Task priority (1-10, higher is more important)
+    #[prost(int32, optional, tag = "5")]
+    pub priority: ::core::option::Option<i32>,
+    /// / Timestamps
+    #[prost(int64, tag = "6")]
+    pub created_at: i64,
+    #[prost(int64, optional, tag = "7")]
+    pub started_at: ::core::option::Option<i64>,
+    #[prost(int64, optional, tag = "8")]
+    pub completed_at: ::core::option::Option<i64>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ObjectList {
@@ -70,6 +142,110 @@ impl ObjectDesignation {
             "OBJECT_DESIGNATION_CIVILIAN" => Some(Self::Civilian),
             "OBJECT_DESIGNATION_ALLY" => Some(Self::Ally),
             "OBJECT_DESIGNATION_FRIENDLY" => Some(Self::Friendly),
+            _ => None,
+        }
+    }
+}
+/// / Type classification for objects in the simulation.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum ObjectType {
+    Unspecified = 0,
+    /// Fighter jets, bombers, transport aircraft
+    FixedWing = 1,
+    /// Helicopters
+    RotaryWing = 2,
+    /// Tanks, APCs, trucks
+    GroundVehicle = 3,
+    /// Ships, boats
+    Naval = 4,
+    /// Ground troops
+    Infantry = 5,
+    /// Unmanned aerial vehicles
+    Uav = 6,
+    /// Missiles, rockets
+    Missile = 7,
+    /// Buildings, installations
+    Structure = 8,
+}
+impl ObjectType {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            Self::Unspecified => "OBJECT_TYPE_UNSPECIFIED",
+            Self::FixedWing => "OBJECT_TYPE_FIXED_WING",
+            Self::RotaryWing => "OBJECT_TYPE_ROTARY_WING",
+            Self::GroundVehicle => "OBJECT_TYPE_GROUND_VEHICLE",
+            Self::Naval => "OBJECT_TYPE_NAVAL",
+            Self::Infantry => "OBJECT_TYPE_INFANTRY",
+            Self::Uav => "OBJECT_TYPE_UAV",
+            Self::Missile => "OBJECT_TYPE_MISSILE",
+            Self::Structure => "OBJECT_TYPE_STRUCTURE",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "OBJECT_TYPE_UNSPECIFIED" => Some(Self::Unspecified),
+            "OBJECT_TYPE_FIXED_WING" => Some(Self::FixedWing),
+            "OBJECT_TYPE_ROTARY_WING" => Some(Self::RotaryWing),
+            "OBJECT_TYPE_GROUND_VEHICLE" => Some(Self::GroundVehicle),
+            "OBJECT_TYPE_NAVAL" => Some(Self::Naval),
+            "OBJECT_TYPE_INFANTRY" => Some(Self::Infantry),
+            "OBJECT_TYPE_UAV" => Some(Self::Uav),
+            "OBJECT_TYPE_MISSILE" => Some(Self::Missile),
+            "OBJECT_TYPE_STRUCTURE" => Some(Self::Structure),
+            _ => None,
+        }
+    }
+}
+/// / Operational status of an object.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum ObjectStatus {
+    Unspecified = 0,
+    /// Operational and mission-capable
+    Active = 1,
+    /// Partially functional
+    Damaged = 2,
+    /// Non-functional
+    Destroyed = 3,
+    /// Returning to base
+    Returning = 4,
+    /// On standby/idle
+    Standby = 5,
+    /// Currently in combat
+    Engaged = 6,
+}
+impl ObjectStatus {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            Self::Unspecified => "OBJECT_STATUS_UNSPECIFIED",
+            Self::Active => "OBJECT_STATUS_ACTIVE",
+            Self::Damaged => "OBJECT_STATUS_DAMAGED",
+            Self::Destroyed => "OBJECT_STATUS_DESTROYED",
+            Self::Returning => "OBJECT_STATUS_RETURNING",
+            Self::Standby => "OBJECT_STATUS_STANDBY",
+            Self::Engaged => "OBJECT_STATUS_ENGAGED",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "OBJECT_STATUS_UNSPECIFIED" => Some(Self::Unspecified),
+            "OBJECT_STATUS_ACTIVE" => Some(Self::Active),
+            "OBJECT_STATUS_DAMAGED" => Some(Self::Damaged),
+            "OBJECT_STATUS_DESTROYED" => Some(Self::Destroyed),
+            "OBJECT_STATUS_RETURNING" => Some(Self::Returning),
+            "OBJECT_STATUS_STANDBY" => Some(Self::Standby),
+            "OBJECT_STATUS_ENGAGED" => Some(Self::Engaged),
             _ => None,
         }
     }

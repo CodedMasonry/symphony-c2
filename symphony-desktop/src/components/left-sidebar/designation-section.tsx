@@ -8,9 +8,10 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronRight } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ObjectDesignation } from "@/lib/generated/base";
+import { ObjectDesignation } from "@/generated/base";
 import { getDesignationName } from "@/lib/proto_api";
 import { ObjectCard } from "./object-card";
+import { Object as ProtoObject } from "@/generated/base";
 import {
   getDesignationVariant,
   getDesignationColor,
@@ -19,15 +20,8 @@ import {
 
 interface DesignationSectionProps {
   designation: ObjectDesignation;
-  objects: Array<{
-    ulidString: string;
-    designation: ObjectDesignation;
-    latitude: number;
-    longitude: number;
-    heading: number;
-    altitude: number;
-    createdAt: Date;
-  }>;
+  // Use the same intersection type expected by ObjectCard
+  objects: Array<ProtoObject & { ulidString: string }>;
   isOpen: boolean;
   onToggle: () => void;
 }

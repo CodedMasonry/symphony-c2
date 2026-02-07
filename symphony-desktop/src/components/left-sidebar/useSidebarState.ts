@@ -1,19 +1,8 @@
-// components/LeftSidebar/useSidebarState.ts
 import { useState, useMemo } from "react";
-import { ObjectDesignation } from "@/lib/generated/base";
+import { ObjectDesignation, Object as ProtoObject } from "@/generated/base";
 import { DEFAULT_SELECTED_DESIGNATIONS } from "./constants";
 
-interface ObjectType {
-  ulidString: string;
-  designation: ObjectDesignation;
-  latitude: number;
-  longitude: number;
-  heading: number;
-  altitude: number;
-  createdAt: Date;
-}
-
-export function useSidebarState(objects: ObjectType[]) {
+export function useSidebarState(objects: ProtoObject[]) {
   const [selectedDesignations, setSelectedDesignations] = useState<
     ObjectDesignation[]
   >(DEFAULT_SELECTED_DESIGNATIONS);
@@ -59,8 +48,16 @@ export function useSidebarState(objects: ObjectType[]) {
     const lowerQuery = searchQuery.toLowerCase().trim();
 
     return objects.filter((obj) => {
-      // Search by ULID
-      if (obj.ulidString.toLowerCase().includes(lowerQuery)) return true;
+      // Search by callsign (if available)
+      if (obj.callsign && obj.callsign.toLowerCase().includes(lowerQuery))
+        return true;
+
+      // Search by model (if available)
+      if (obj.model && obj.model.toLowerCase().includes(lowerQuery))
+        return true;
+
+      // Search by unit (if available)
+      if (obj.unit && obj.unit.toLowerCase().includes(lowerQuery)) return true;
 
       // Search by coordinates (latitude, longitude)
       if (obj.latitude.toString().includes(lowerQuery)) return true;
@@ -72,6 +69,9 @@ export function useSidebarState(objects: ObjectType[]) {
       // Search by heading
       if (obj.heading.toString().includes(lowerQuery)) return true;
 
+      // Search by speed (if available)
+      if (obj.speed && obj.speed.toString().includes(lowerQuery)) return true;
+
       return false;
     });
   }, [objects, searchQuery]);
@@ -79,10 +79,10 @@ export function useSidebarState(objects: ObjectType[]) {
   // Group and sort objects by designation
   const groupedObjects = useMemo(() => {
     const sortedObjects = [...filteredObjects].sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+      (a, b) => b.createdAt - a.createdAt,
     );
 
-    const groups = new Map<ObjectDesignation, ObjectType[]>();
+    const groups = new Map<ObjectDesignation, ProtoObject[]>();
 
     sortedObjects.forEach((obj) => {
       if (!groups.has(obj.designation)) {
