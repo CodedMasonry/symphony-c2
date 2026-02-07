@@ -4,19 +4,14 @@ import { useObjectsStore } from "@/lib/stores/objectsStore";
 import { SidebarHeader } from "./left-sidebar/sidebar-header";
 import { SidebarContent } from "./left-sidebar/sidebar-content";
 import { useSidebarState } from "./left-sidebar/useSidebarState";
-import { Button } from "@/components/ui/button";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 
 interface ObjectListSidebarProps extends React.ComponentProps<"div"> {
   isOpen: boolean;
-  onToggle: () => void;
 }
 
 export function ObjectListSidebar({
   className,
   isOpen,
-  onToggle,
   ...props
 }: ObjectListSidebarProps) {
   const objects = useObjectsStore((state) => state.objects);
@@ -43,14 +38,14 @@ export function ObjectListSidebar({
   return (
     <div
       className={cn(
-        "absolute top-4 left-4 z-20 transition-all duration-300 ease-in-out flex items-start gap-2",
-        isOpen ? "translate-x-0" : "-translate-x-[calc(100%-16px)]", // Slightly peeks out when closed
+        "absolute top-4 bottom-4 left-4 z-20 transition-transform duration-300 ease-in-out",
+        !isOpen && "-translate-x-90",
         className,
       )}
       {...props}
     >
-      {/* Floating Panel Container */}
-      <div className="flex flex-col h-[calc(100vh-theme(--spacing(24)))] w-80 bg-background/95 backdrop-blur shadow-2xl rounded-xl border overflow-hidden">
+      {/* Main Sidebar Panel */}
+      <div className="flex flex-col h-full w-80 bg-background/95 backdrop-blur shadow-2xl rounded-xl border-2 border-border overflow-hidden">
         <SidebarHeader
           objectCount={objects.length}
           filteredCount={filteredCount}
@@ -72,19 +67,6 @@ export function ObjectListSidebar({
           onRetry={loadObjects}
         />
       </div>
-
-      {/* Toggle Button - Outside the main panel container */}
-      <Button
-        variant="secondary"
-        size="icon"
-        className="mt-2 shadow-md border border-border bg-background"
-        onClick={onToggle}
-      >
-        <HugeiconsIcon
-          icon={isOpen ? ArrowLeft01Icon : ArrowRight01Icon}
-          size={20}
-        />
-      </Button>
     </div>
   );
 }

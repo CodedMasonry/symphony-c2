@@ -20,7 +20,6 @@ import {
 
 interface DesignationSectionProps {
   designation: ObjectDesignation;
-  // Use the same intersection type expected by ObjectCard
   objects: Array<ProtoObject & { ulidString: string }>;
   isOpen: boolean;
   onToggle: () => void;
@@ -61,7 +60,7 @@ export function DesignationSection({
             </Badge>
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-2 pl-2">
+        <CollapsibleContent className="space-y-2 px-1">
           {objects.map((obj) => (
             <ObjectCard key={obj.ulidString} object={obj} />
           ))}
