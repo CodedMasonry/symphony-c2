@@ -22,7 +22,9 @@ message Object {
   /// GPS Coordinates & Orientation.
   float longitude = 3;
   float latitude = 4;
+  /// Measured as MSL
   float altitude = 5;
+  /// Measued in degrees
   float heading = 6;
 }
 

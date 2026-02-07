@@ -1,40 +1,31 @@
-import { useEffect, useState } from "react";
+// components/LeftSidebar.tsx
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
-import {
-  fetchObjects,
-  ObjectWithUlid,
-  getDesignationName,
-} from "@/lib/proto_api";
+import { getDesignationName } from "@/lib/proto_api";
 import { ObjectDesignation } from "@/lib/generated/base";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { RefreshCw, Loader2, MapPin, Compass } from "lucide-react";
+import { useObjectsStore } from "@/lib/stores/objectsStore";
+import {
+  Compass01Icon,
+  LoaderCircle,
+  MapPin,
+  Refresh,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 function LeftSidebar({ className, ...props }: React.ComponentProps<"div">) {
-  const [objects, setObjects] = useState<ObjectWithUlid[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const objects = useObjectsStore((state) => state.objects);
+  const loading = useObjectsStore((state) => state.loading);
+  const error = useObjectsStore((state) => state.error);
+  const loadObjects = useObjectsStore((state) => state.loadObjects);
 
   useEffect(() => {
     loadObjects();
-  }, []);
-
-  const loadObjects = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchObjects();
-      setObjects(data);
-      setError(null);
-    } catch (err) {
-      console.error("Failed to load objects:", err);
-      setError(err instanceof Error ? err.message : "Unknown error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [loadObjects]);
 
   return (
     <div
@@ -56,7 +47,11 @@ function LeftSidebar({ className, ...props }: React.ComponentProps<"div">) {
             onClick={loadObjects}
             disabled={loading}
           >
-            <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+            <HugeiconsIcon
+              icon={Refresh}
+              strokeWidth={2}
+              className={cn("h-4 w-4", loading && "animate-spin")}
+            />
           </Button>
         </div>
       </div>
@@ -66,7 +61,11 @@ function LeftSidebar({ className, ...props }: React.ComponentProps<"div">) {
         <div className="p-4 space-y-3">
           {loading && objects.length === 0 ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <HugeiconsIcon
+                icon={LoaderCircle}
+                strokeWidth={2}
+                className="h-6 w-6 animate-spin text-muted-foreground"
+              />
             </div>
           ) : error ? (
             <Card className="border-destructive">
@@ -109,18 +108,26 @@ function LeftSidebar({ className, ...props }: React.ComponentProps<"div">) {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div className="flex items-center text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3 mr-1" />
+                    <HugeiconsIcon
+                      icon={MapPin}
+                      strokeWidth={2}
+                      className="h-3 w-3 mr-1"
+                    />
                     <span>
                       {obj.latitude.toFixed(4)}°, {obj.longitude.toFixed(4)}°
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center text-muted-foreground">
-                      <Compass className="h-3 w-3 mr-1" />
+                      <HugeiconsIcon
+                        icon={Compass01Icon}
+                        strokeWidth={2}
+                        className="h-3 w-3 mr-1"
+                      />
                       <span>{obj.heading.toFixed(0)}°</span>
                     </div>
                     <span className="text-muted-foreground">
-                      {obj.altitude.toFixed(0)}m
+                      {obj.altitude.toFixed(0)}ft
                     </span>
                   </div>
                   <Separator />
@@ -145,7 +152,7 @@ function getDesignationVariant(
       return "destructive";
     case ObjectDesignation.OBJECT_DESIGNATION_FRIENDLY:
     case ObjectDesignation.OBJECT_DESIGNATION_ALLY:
-      return "secondary"; // Use secondary as base, will override color with className
+      return "secondary";
     case ObjectDesignation.OBJECT_DESIGNATION_CIVILIAN:
       return "secondary";
     case ObjectDesignation.OBJECT_DESIGNATION_UNSPECIFIED:
@@ -165,7 +172,7 @@ function getDesignationColor(designation: ObjectDesignation): string {
       return "bg-gray-500/20 text-gray-400";
     case ObjectDesignation.OBJECT_DESIGNATION_UNSPECIFIED:
     default:
-      return ""; // outline variant is fine
+      return "";
   }
 }
 
