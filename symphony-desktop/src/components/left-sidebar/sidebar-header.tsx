@@ -8,7 +8,6 @@ import { ObjectDesignation } from "@/lib/generated/base";
 interface SidebarHeaderProps {
   objectCount: number;
   loading: boolean;
-  selectedDesignations: ObjectDesignation[];
   onRefresh: () => void;
   onToggleDesignation: (designation: ObjectDesignation) => void;
   isDesignationChecked: (designation: ObjectDesignation) => boolean;
@@ -17,7 +16,6 @@ interface SidebarHeaderProps {
 export function SidebarHeader({
   objectCount,
   loading,
-  selectedDesignations,
   onRefresh,
   onToggleDesignation,
   isDesignationChecked,
@@ -44,7 +42,6 @@ export function SidebarHeader({
       </div>
 
       <DesignationFilter
-        selectedCount={selectedDesignations.length}
         onToggleDesignation={onToggleDesignation}
         isDesignationChecked={isDesignationChecked}
       />

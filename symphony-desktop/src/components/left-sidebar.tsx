@@ -36,7 +36,6 @@ export function ObjectListSidebar({
       <SidebarHeader
         objectCount={objects.length}
         loading={loading}
-        selectedDesignations={selectedDesignations}
         onRefresh={loadObjects}
         onToggleDesignation={toggleDesignation}
         isDesignationChecked={isDesignationChecked}

@@ -15,13 +15,11 @@ import { DESIGNATION_ORDER } from "./constants";
 import { getDesignationIndicatorColor } from "./utils";
 
 interface DesignationFilterProps {
-  selectedCount: number;
   onToggleDesignation: (designation: ObjectDesignation) => void;
   isDesignationChecked: (designation: ObjectDesignation) => boolean;
 }
 
 export function DesignationFilter({
-  selectedCount,
   onToggleDesignation,
   isDesignationChecked,
 }: DesignationFilterProps) {
@@ -34,7 +32,7 @@ export function DesignationFilter({
             strokeWidth={2}
             className="h-4 w-4 mr-2"
           />
-          Filter ({selectedCount})
+          Filter
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48">
