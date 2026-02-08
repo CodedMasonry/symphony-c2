@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import * as Cesium from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import { cn } from "@/lib/utils";
@@ -10,130 +10,87 @@ interface CesiumMapProps extends React.ComponentProps<"div"> {
   selectedObjectId?: string | null;
 }
 
-function HoverTooltip({
-  object,
-  position,
-}: {
-  object: ObjectWithUlid;
-  position: { x: number; y: number };
-}) {
-  return (
-    <div
-      className="fixed pointer-events-none z-50"
-      style={{ left: `${position.x + 15}px`, top: `${position.y + 15}px` }}
-    >
-      <div className="bg-background/95 backdrop-blur-sm border rounded-lg shadow-lg p-3 max-w-xs">
-        <p className="font-semibold text-sm">
-          {object.callsign || object.model || "Unknown"}
-        </p>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-          <span>{object.altitude.toFixed(0)} ft</span>
-          <span>{object.heading.toFixed(0)}°</span>
-          {object.speed && <span>{object.speed.toFixed(0)} kts</span>}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CesiumMap({
+export default function CesiumMap({
   className,
   onObjectSelect,
   selectedObjectId,
   ...props
 }: CesiumMapProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<Cesium.Viewer | null>(null);
-  const cesiumContainerRef = useRef<HTMLDivElement>(null);
-  const [hoveredObject, setHoveredObject] = useState<ObjectWithUlid | null>(
-    null,
-  );
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) =>
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+    if (!containerRef.current || viewerRef.current) return;
 
-  useEffect(() => {
     window.CESIUM_BASE_URL = "/cesiumStatic";
     Cesium.Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_ION_TOKEN;
 
-    if (cesiumContainerRef.current && !viewerRef.current) {
-      viewerRef.current = new Cesium.Viewer(cesiumContainerRef.current, {
-        terrain: Cesium.Terrain.fromWorldTerrain(),
-        selectionIndicator: false, // Disables the green box
-        infoBox: false, // Disables the default "Tab" UI
-        baseLayerPicker: false,
-        geocoder: false,
-        homeButton: false,
-        sceneModePicker: false,
-        navigationHelpButton: false,
-        animation: false,
-        timeline: false,
-        fullscreenButton: false,
-      });
+    const viewer = new Cesium.Viewer(containerRef.current, {
+      terrain: Cesium.Terrain.fromWorldTerrain(),
+      selectionIndicator: false,
+      infoBox: false,
+      baseLayerPicker: false,
+      geocoder: false,
+      homeButton: false,
+      sceneModePicker: false,
+      navigationHelpButton: false,
+      animation: false,
+      timeline: false,
+      fullscreenButton: false,
+    });
 
-      viewerRef.current.scene.globe.depthTestAgainstTerrain = true;
-      viewerRef.current.scene.requestRenderMode = true;
-      viewerRef.current.camera.setView({
-        destination: Cesium.Cartesian3.fromDegrees(-115.0, 36.0, 500000),
-      });
-    }
+    viewer.scene.requestRenderMode = true;
+    viewer.scene.maximumRenderTimeChange = Infinity;
+    viewer.scene.globe.depthTestAgainstTerrain = true;
+
+    viewer.camera.setView({
+      destination: Cesium.Cartesian3.fromDegrees(-115, 36, 600_000),
+    });
+
+    viewerRef.current = viewer;
 
     return () => {
-      viewerRef.current?.destroy();
+      viewer.destroy();
       viewerRef.current = null;
     };
   }, []);
 
-  const handleObjectClick = (obj: ObjectWithUlid) => {
+  const handleSelect = (obj: ObjectWithUlid | null) => {
     onObjectSelect?.(obj);
-    if (viewerRef.current) {
-      // Prevent Cesium from "locking on" and orbiting the object
-      viewerRef.current.trackedEntity = undefined;
+    if (!obj || !viewerRef.current) return;
 
-      const altitudeMeters = obj.altitude * 0.3048;
-      const objectPosition = Cesium.Cartesian3.fromDegrees(
-        obj.longitude,
-        obj.latitude,
-        altitudeMeters,
-      );
+    const viewer = viewerRef.current;
 
-      viewerRef.current.camera.flyToBoundingSphere(
-        new Cesium.BoundingSphere(objectPosition, 10000),
-        {
-          duration: 1.5,
-          offset: new Cesium.HeadingPitchRange(
-            0,
-            Cesium.Math.toRadians(-45),
-            15000,
-          ),
-        },
-      );
-    }
+    const position = Cesium.Cartesian3.fromDegrees(
+      obj.longitude,
+      obj.latitude,
+      obj.altitude * 0.3048,
+    );
+
+    viewer.camera.flyToBoundingSphere(
+      new Cesium.BoundingSphere(position, 12_000),
+      {
+        duration: 1.1,
+        offset: new Cesium.HeadingPitchRange(
+          viewer.camera.heading,
+          Cesium.Math.toRadians(-35),
+          20_000,
+        ),
+      },
+    );
   };
 
   useCesiumObjects({
     viewer: viewerRef.current,
     selectedObjectId,
-    onObjectClick: handleObjectClick,
-    onObjectHover: setHoveredObject,
+    onObjectClick: handleSelect,
   });
 
   return (
-    <>
-      <div
-        ref={cesiumContainerRef}
-        className={cn("w-full h-full", className)}
-        {...props}
-      />
-      {hoveredObject && (
-        <HoverTooltip object={hoveredObject} position={mousePosition} />
-      )}
-    </>
+    <div
+      ref={containerRef}
+      className={cn("w-full h-full", className)}
+      {...props}
+    />
   );
 }
-
-export default CesiumMap;

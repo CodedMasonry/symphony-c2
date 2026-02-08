@@ -62,7 +62,9 @@ export function DesignationSection({
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-2 px-1">
           {objects.map((obj) => (
-            <ObjectCard key={obj.ulidString} object={obj} />
+            <div key={obj.ulidString}>
+              <ObjectCard key={obj.ulidString} object={obj} />
+            </div>
           ))}
         </CollapsibleContent>
       </div>
