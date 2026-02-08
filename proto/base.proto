@@ -44,7 +44,7 @@ message Object {
   ObjectDesignation designation = 2;
 
   /// Type classification (aircraft, ground unit, etc.)
-  ObjectType type = 3;
+  ObjectType object_type = 3;
 
   /// GPS Coordinates & Orientation.
   float longitude = 4;

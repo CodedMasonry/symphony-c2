@@ -10,7 +10,7 @@ pub struct Object {
     pub designation: i32,
     /// / Type classification (aircraft, ground unit, etc.)
     #[prost(enumeration = "ObjectType", tag = "3")]
-    pub r#type: i32,
+    pub object_type: i32,
     /// / GPS Coordinates & Orientation.
     #[prost(float, tag = "4")]
     pub longitude: f32,

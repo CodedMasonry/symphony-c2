@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { useObjectsStore } from "@/lib/stores/objectsStore";
+import { useObjectsStore } from "@/stores/objectsStore";
 import { SidebarHeader } from "./left-sidebar/sidebar-header";
 import { SidebarContent } from "./left-sidebar/sidebar-content";
 import { useSidebarState } from "./left-sidebar/useSidebarState";

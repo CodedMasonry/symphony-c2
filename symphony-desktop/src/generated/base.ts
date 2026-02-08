@@ -222,7 +222,7 @@ export interface Object {
   /** / The alliance/designation of the entity. */
   designation: ObjectDesignation;
   /** / Type classification (aircraft, ground unit, etc.) */
-  type: ObjectType;
+  objectType: ObjectType;
   /** / GPS Coordinates & Orientation. */
   longitude: number;
   latitude: number;
@@ -234,27 +234,41 @@ export interface Object {
    * / Velocity & Movement
    * / Speed in knots
    */
-  speed?: number | undefined;
+  speed?:
+    | number
+    | undefined;
   /** / Vertical speed (climb/descent rate) in feet per minute */
-  verticalSpeed?: number | undefined;
+  verticalSpeed?:
+    | number
+    | undefined;
   /**
    * / Operational Data
    * / Current operational status
    */
   status: ObjectStatus;
   /** / Fuel remaining as percentage (0-100) */
-  fuelPercentage?: number | undefined;
+  fuelPercentage?:
+    | number
+    | undefined;
   /** / Ammunition/weapons remaining as percentage (0-100) */
-  ammoPercentage?: number | undefined;
+  ammoPercentage?:
+    | number
+    | undefined;
   /**
    * / Identification & Metadata
    * / Human-readable name/callsign (e.g., "Eagle-1", "Tank-Alpha-3")
    */
-  callsign?: string | undefined;
+  callsign?:
+    | string
+    | undefined;
   /** / Model/class identifier (e.g., "F-16C", "M1A2 Abrams", "AH-64 Apache") */
-  model?: string | undefined;
+  model?:
+    | string
+    | undefined;
   /** / Unit or squadron this object belongs to */
-  unit?: string | undefined;
+  unit?:
+    | string
+    | undefined;
   /**
    * / Timestamps
    * / When this object was created/spawned in the simulation (Unix timestamp)
@@ -266,7 +280,9 @@ export interface Object {
    * / Mission & Task Data
    * / Current task ID if assigned
    */
-  currentTaskId?: Uint8Array | undefined;
+  currentTaskId?:
+    | Uint8Array
+    | undefined;
   /** / Home base or spawn location */
   homeBase?: Location | undefined;
 }
@@ -275,7 +291,9 @@ export interface Object {
 export interface Location {
   longitude: number;
   latitude: number;
-  altitude?: number | undefined;
+  altitude?:
+    | number
+    | undefined;
   /** e.g., "Nellis AFB", "Forward Operating Base Alpha" */
   name?: string | undefined;
 }
@@ -287,11 +305,17 @@ export interface Task {
   /** / The ID of the object performing the task. */
   assignedObjectId: Uint8Array;
   /** / Optional target for the task. */
-  targetObjectId?: Uint8Array | undefined;
+  targetObjectId?:
+    | Uint8Array
+    | undefined;
   /** / Task type/description */
-  taskType?: string | undefined;
+  taskType?:
+    | string
+    | undefined;
   /** / Task priority (1-10, higher is more important) */
-  priority?: number | undefined;
+  priority?:
+    | number
+    | undefined;
   /** / Timestamps */
   createdAt: number;
   startedAt?: number | undefined;
@@ -306,7 +330,7 @@ function createBaseObject(): Object {
   return {
     objectId: new Uint8Array(0),
     designation: 0,
-    type: 0,
+    objectType: 0,
     longitude: 0,
     latitude: 0,
     altitude: 0,
@@ -327,18 +351,15 @@ function createBaseObject(): Object {
 }
 
 export const Object: MessageFns<Object> = {
-  encode(
-    message: Object,
-    writer: BinaryWriter = new BinaryWriter(),
-  ): BinaryWriter {
+  encode(message: Object, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.objectId.length !== 0) {
       writer.uint32(10).bytes(message.objectId);
     }
     if (message.designation !== 0) {
       writer.uint32(16).int32(message.designation);
     }
-    if (message.type !== 0) {
-      writer.uint32(24).int32(message.type);
+    if (message.objectType !== 0) {
+      writer.uint32(24).int32(message.objectType);
     }
     if (message.longitude !== 0) {
       writer.uint32(37).float(message.longitude);
@@ -392,8 +413,7 @@ export const Object: MessageFns<Object> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): Object {
-    const reader =
-      input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseObject();
     while (reader.pos < end) {
@@ -420,7 +440,7 @@ export const Object: MessageFns<Object> = {
             break;
           }
 
-          message.type = reader.int32() as any;
+          message.objectType = reader.int32() as any;
           continue;
         }
         case 4: {
@@ -565,15 +585,15 @@ export const Object: MessageFns<Object> = {
       objectId: isSet(object.objectId)
         ? bytesFromBase64(object.objectId)
         : isSet(object.object_id)
-          ? bytesFromBase64(object.object_id)
-          : new Uint8Array(0),
-      designation: isSet(object.designation)
-        ? objectDesignationFromJSON(object.designation)
+        ? bytesFromBase64(object.object_id)
+        : new Uint8Array(0),
+      designation: isSet(object.designation) ? objectDesignationFromJSON(object.designation) : 0,
+      objectType: isSet(object.objectType)
+        ? objectTypeFromJSON(object.objectType)
+        : isSet(object.object_type)
+        ? objectTypeFromJSON(object.object_type)
         : 0,
-      type: isSet(object.type) ? objectTypeFromJSON(object.type) : 0,
-      longitude: isSet(object.longitude)
-        ? globalThis.Number(object.longitude)
-        : 0,
+      longitude: isSet(object.longitude) ? globalThis.Number(object.longitude) : 0,
       latitude: isSet(object.latitude) ? globalThis.Number(object.latitude) : 0,
       altitude: isSet(object.altitude) ? globalThis.Number(object.altitude) : 0,
       heading: isSet(object.heading) ? globalThis.Number(object.heading) : 0,
@@ -581,44 +601,42 @@ export const Object: MessageFns<Object> = {
       verticalSpeed: isSet(object.verticalSpeed)
         ? globalThis.Number(object.verticalSpeed)
         : isSet(object.vertical_speed)
-          ? globalThis.Number(object.vertical_speed)
-          : undefined,
+        ? globalThis.Number(object.vertical_speed)
+        : undefined,
       status: isSet(object.status) ? objectStatusFromJSON(object.status) : 0,
       fuelPercentage: isSet(object.fuelPercentage)
         ? globalThis.Number(object.fuelPercentage)
         : isSet(object.fuel_percentage)
-          ? globalThis.Number(object.fuel_percentage)
-          : undefined,
+        ? globalThis.Number(object.fuel_percentage)
+        : undefined,
       ammoPercentage: isSet(object.ammoPercentage)
         ? globalThis.Number(object.ammoPercentage)
         : isSet(object.ammo_percentage)
-          ? globalThis.Number(object.ammo_percentage)
-          : undefined,
-      callsign: isSet(object.callsign)
-        ? globalThis.String(object.callsign)
+        ? globalThis.Number(object.ammo_percentage)
         : undefined,
+      callsign: isSet(object.callsign) ? globalThis.String(object.callsign) : undefined,
       model: isSet(object.model) ? globalThis.String(object.model) : undefined,
       unit: isSet(object.unit) ? globalThis.String(object.unit) : undefined,
       createdAt: isSet(object.createdAt)
         ? globalThis.Number(object.createdAt)
         : isSet(object.created_at)
-          ? globalThis.Number(object.created_at)
-          : 0,
+        ? globalThis.Number(object.created_at)
+        : 0,
       updatedAt: isSet(object.updatedAt)
         ? globalThis.Number(object.updatedAt)
         : isSet(object.updated_at)
-          ? globalThis.Number(object.updated_at)
-          : 0,
+        ? globalThis.Number(object.updated_at)
+        : 0,
       currentTaskId: isSet(object.currentTaskId)
         ? bytesFromBase64(object.currentTaskId)
         : isSet(object.current_task_id)
-          ? bytesFromBase64(object.current_task_id)
-          : undefined,
+        ? bytesFromBase64(object.current_task_id)
+        : undefined,
       homeBase: isSet(object.homeBase)
         ? Location.fromJSON(object.homeBase)
         : isSet(object.home_base)
-          ? Location.fromJSON(object.home_base)
-          : undefined,
+        ? Location.fromJSON(object.home_base)
+        : undefined,
     };
   },
 
@@ -630,8 +648,8 @@ export const Object: MessageFns<Object> = {
     if (message.designation !== 0) {
       obj.designation = objectDesignationToJSON(message.designation);
     }
-    if (message.type !== 0) {
-      obj.type = objectTypeToJSON(message.type);
+    if (message.objectType !== 0) {
+      obj.objectType = objectTypeToJSON(message.objectType);
     }
     if (message.longitude !== 0) {
       obj.longitude = message.longitude;
@@ -691,7 +709,7 @@ export const Object: MessageFns<Object> = {
     const message = createBaseObject();
     message.objectId = object.objectId ?? new Uint8Array(0);
     message.designation = object.designation ?? 0;
-    message.type = object.type ?? 0;
+    message.objectType = object.objectType ?? 0;
     message.longitude = object.longitude ?? 0;
     message.latitude = object.latitude ?? 0;
     message.altitude = object.altitude ?? 0;
@@ -707,10 +725,9 @@ export const Object: MessageFns<Object> = {
     message.createdAt = object.createdAt ?? 0;
     message.updatedAt = object.updatedAt ?? 0;
     message.currentTaskId = object.currentTaskId ?? undefined;
-    message.homeBase =
-      object.homeBase !== undefined && object.homeBase !== null
-        ? Location.fromPartial(object.homeBase)
-        : undefined;
+    message.homeBase = (object.homeBase !== undefined && object.homeBase !== null)
+      ? Location.fromPartial(object.homeBase)
+      : undefined;
     return message;
   },
 };
@@ -720,10 +737,7 @@ function createBaseLocation(): Location {
 }
 
 export const Location: MessageFns<Location> = {
-  encode(
-    message: Location,
-    writer: BinaryWriter = new BinaryWriter(),
-  ): BinaryWriter {
+  encode(message: Location, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.longitude !== 0) {
       writer.uint32(13).float(message.longitude);
     }
@@ -740,8 +754,7 @@ export const Location: MessageFns<Location> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): Location {
-    const reader =
-      input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseLocation();
     while (reader.pos < end) {
@@ -790,13 +803,9 @@ export const Location: MessageFns<Location> = {
 
   fromJSON(object: any): Location {
     return {
-      longitude: isSet(object.longitude)
-        ? globalThis.Number(object.longitude)
-        : 0,
+      longitude: isSet(object.longitude) ? globalThis.Number(object.longitude) : 0,
       latitude: isSet(object.latitude) ? globalThis.Number(object.latitude) : 0,
-      altitude: isSet(object.altitude)
-        ? globalThis.Number(object.altitude)
-        : undefined,
+      altitude: isSet(object.altitude) ? globalThis.Number(object.altitude) : undefined,
       name: isSet(object.name) ? globalThis.String(object.name) : undefined,
     };
   },
@@ -845,10 +854,7 @@ function createBaseTask(): Task {
 }
 
 export const Task: MessageFns<Task> = {
-  encode(
-    message: Task,
-    writer: BinaryWriter = new BinaryWriter(),
-  ): BinaryWriter {
+  encode(message: Task, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.taskId.length !== 0) {
       writer.uint32(10).bytes(message.taskId);
     }
@@ -877,8 +883,7 @@ export const Task: MessageFns<Task> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): Task {
-    const reader =
-      input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseTask();
     while (reader.pos < end) {
@@ -962,41 +967,39 @@ export const Task: MessageFns<Task> = {
       taskId: isSet(object.taskId)
         ? bytesFromBase64(object.taskId)
         : isSet(object.task_id)
-          ? bytesFromBase64(object.task_id)
-          : new Uint8Array(0),
+        ? bytesFromBase64(object.task_id)
+        : new Uint8Array(0),
       assignedObjectId: isSet(object.assignedObjectId)
         ? bytesFromBase64(object.assignedObjectId)
         : isSet(object.assigned_object_id)
-          ? bytesFromBase64(object.assigned_object_id)
-          : new Uint8Array(0),
+        ? bytesFromBase64(object.assigned_object_id)
+        : new Uint8Array(0),
       targetObjectId: isSet(object.targetObjectId)
         ? bytesFromBase64(object.targetObjectId)
         : isSet(object.target_object_id)
-          ? bytesFromBase64(object.target_object_id)
-          : undefined,
+        ? bytesFromBase64(object.target_object_id)
+        : undefined,
       taskType: isSet(object.taskType)
         ? globalThis.String(object.taskType)
         : isSet(object.task_type)
-          ? globalThis.String(object.task_type)
-          : undefined,
-      priority: isSet(object.priority)
-        ? globalThis.Number(object.priority)
+        ? globalThis.String(object.task_type)
         : undefined,
+      priority: isSet(object.priority) ? globalThis.Number(object.priority) : undefined,
       createdAt: isSet(object.createdAt)
         ? globalThis.Number(object.createdAt)
         : isSet(object.created_at)
-          ? globalThis.Number(object.created_at)
-          : 0,
+        ? globalThis.Number(object.created_at)
+        : 0,
       startedAt: isSet(object.startedAt)
         ? globalThis.Number(object.startedAt)
         : isSet(object.started_at)
-          ? globalThis.Number(object.started_at)
-          : undefined,
+        ? globalThis.Number(object.started_at)
+        : undefined,
       completedAt: isSet(object.completedAt)
         ? globalThis.Number(object.completedAt)
         : isSet(object.completed_at)
-          ? globalThis.Number(object.completed_at)
-          : undefined,
+        ? globalThis.Number(object.completed_at)
+        : undefined,
     };
   },
 
@@ -1051,10 +1054,7 @@ function createBaseObjectList(): ObjectList {
 }
 
 export const ObjectList: MessageFns<ObjectList> = {
-  encode(
-    message: ObjectList,
-    writer: BinaryWriter = new BinaryWriter(),
-  ): BinaryWriter {
+  encode(message: ObjectList, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     for (const v of message.objects) {
       Object.encode(v!, writer.uint32(10).fork()).join();
     }
@@ -1062,8 +1062,7 @@ export const ObjectList: MessageFns<ObjectList> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): ObjectList {
-    const reader =
-      input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseObjectList();
     while (reader.pos < end) {
@@ -1088,9 +1087,7 @@ export const ObjectList: MessageFns<ObjectList> = {
 
   fromJSON(object: any): ObjectList {
     return {
-      objects: globalThis.Array.isArray(object?.objects)
-        ? object.objects.map((e: any) => Object.fromJSON(e))
-        : [],
+      objects: globalThis.Array.isArray(object?.objects) ? object.objects.map((e: any) => Object.fromJSON(e)) : [],
     };
   },
 
@@ -1105,9 +1102,7 @@ export const ObjectList: MessageFns<ObjectList> = {
   create<I extends Exact<DeepPartial<ObjectList>, I>>(base?: I): ObjectList {
     return ObjectList.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ObjectList>, I>>(
-    object: I,
-  ): ObjectList {
+  fromPartial<I extends Exact<DeepPartial<ObjectList>, I>>(object: I): ObjectList {
     const message = createBaseObjectList();
     message.objects = object.objects?.map((e) => Object.fromPartial(e)) || [];
     return message;
@@ -1139,31 +1134,17 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends globalThis.Array<infer U>
-    ? globalThis.Array<DeepPartial<U>>
-    : T extends ReadonlyArray<infer U>
-      ? ReadonlyArray<DeepPartial<U>>
-      : T extends {}
-        ? { [K in keyof T]?: DeepPartial<T[K]> }
-        : Partial<T>;
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin
-  ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & {
-      [K in Exclude<keyof I, KeysOfUnion<P>>]: never;
-    };
+export type Exact<P, I extends P> = P extends Builtin ? P
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
 
 function longToNumber(int64: { toString(): string }): number {
   const num = globalThis.Number(int64.toString());

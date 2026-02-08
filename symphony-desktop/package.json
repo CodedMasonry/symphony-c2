@@ -11,6 +11,7 @@
     "proto:gen": "mkdir -p src/generated && protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=src/generated --proto_path=../proto ../proto/base.proto"
   },
   "dependencies": {
+    "@base-ui/react": "^1.1.0",
     "@bufbuild/protobuf": "^2.11.0",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@hugeicons/core-free-icons": "^3.1.1",
