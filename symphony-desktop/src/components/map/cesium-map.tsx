@@ -44,7 +44,10 @@ export default function CesiumMap({
     viewer.scene.globe.depthTestAgainstTerrain = true;
 
     viewer.camera.setView({
-      destination: Cesium.Cartesian3.fromDegrees(-115, 36, 600_000),
+      destination: Cesium.Cartesian3.fromDegrees(-115, 30, 800_000),
+      orientation: {
+        pitch: Cesium.Math.toRadians(-45),
+      },
     });
 
     viewerRef.current = viewer;

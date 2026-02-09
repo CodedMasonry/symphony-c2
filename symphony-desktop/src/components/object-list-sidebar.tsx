@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useObjectsStore } from "@/stores/objectsStore";
-import { SidebarHeader } from "./left-sidebar/sidebar-header";
-import { SidebarContent } from "./left-sidebar/sidebar-content";
-import { useSidebarState } from "./left-sidebar/useSidebarState";
+import { SidebarHeader } from "./object-list-sidebar/sidebar-header";
+import { SidebarContent } from "./object-list-sidebar/sidebar-content";
+import { useSidebarState } from "./object-list-sidebar/useSidebarState";
 
 interface ObjectListSidebarProps extends React.ComponentProps<"div"> {
   isOpen: boolean;

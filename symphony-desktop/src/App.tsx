@@ -3,8 +3,8 @@ import CesiumMap from "@/components/map/cesium-map";
 import { TopBar } from "./components/top-bar";
 import { ObjectListSidebar } from "./components/object-list-sidebar";
 import { useObjectsStore } from "@/stores/objectsStore";
-import { useSidebarState } from "./components/left-sidebar/useSidebarState";
-import { ObjectCard } from "@/components/left-sidebar/object-card";
+import { useSidebarState } from "./components/object-list-sidebar/useSidebarState";
+import { ObjectCard } from "@/components/object-list-sidebar/object-card";
 
 export function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
