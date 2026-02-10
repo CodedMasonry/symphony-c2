@@ -7,18 +7,24 @@ import { ObjectWithUlid } from "@/lib/proto_api";
 import { ObjectHoverCard } from "@/components/map/object-hover-card";
 
 interface CesiumMapProps extends React.ComponentProps<"div"> {
-  onObjectSelect?: (obj: ObjectWithUlid | null) => void;
   selectedObjectId?: string | null;
+  onObjectSelect?: (objectId: string | null) => void;
+  viewerRef?: React.MutableRefObject<Cesium.Viewer | null>;
 }
 
 export default function CesiumMap({
   className,
-  onObjectSelect,
   selectedObjectId,
+  onObjectSelect,
+  viewerRef: externalViewerRef,
   ...props
 }: CesiumMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const viewerRef = useRef<Cesium.Viewer | null>(null);
+  const internalViewerRef = useRef<Cesium.Viewer | null>(null);
+
+  // Use external ref if provided, otherwise use internal
+  const viewerRef = externalViewerRef || internalViewerRef;
+
   const [hoveredObject, setHoveredObject] = useState<{
     object: ObjectWithUlid;
     position: { x: number; y: number };
@@ -55,14 +61,27 @@ export default function CesiumMap({
       viewer.destroy();
       viewerRef.current = null;
     };
-  }, []);
+  }, [viewerRef]);
 
-  const handleSelect = useCallback(
+  // Handle single click - just select
+  const handleClick = useCallback(
     (obj: ObjectWithUlid | null) => {
       setHoveredObject(null);
+      onObjectSelect?.(obj?.ulidString ?? null);
+    },
+    [onObjectSelect],
+  );
 
-      onObjectSelect?.(obj);
+  // Handle double click - select and fly to (handled by hook)
+  const handleDoubleClick = useCallback(
+    (obj: ObjectWithUlid | null) => {
       if (!obj || !viewerRef.current) return;
+      setHoveredObject(null);
+
+      // Select the object
+      onObjectSelect?.(obj.ulidString);
+
+      // Fly to the object
       const viewer = viewerRef.current;
       const position = Cesium.Cartesian3.fromDegrees(
         obj.longitude,
@@ -81,7 +100,7 @@ export default function CesiumMap({
         },
       );
     },
-    [onObjectSelect],
+    [onObjectSelect, viewerRef],
   );
 
   const handleHover = useCallback(
@@ -98,7 +117,8 @@ export default function CesiumMap({
   useCesiumObjects({
     viewer: viewerRef.current,
     selectedObjectId,
-    onObjectClick: handleSelect,
+    onObjectClick: handleClick,
+    onObjectDoubleClick: handleDoubleClick,
     onObjectHover: handleHover,
   });
 

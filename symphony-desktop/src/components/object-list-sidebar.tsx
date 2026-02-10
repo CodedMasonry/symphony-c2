@@ -7,18 +7,23 @@ import { useSidebarState } from "./object-list-sidebar/useSidebarState";
 
 interface ObjectListSidebarProps extends React.ComponentProps<"div"> {
   isOpen: boolean;
+  selectedObjectId?: string | null;
+  onObjectSelect?: (objectId: string | null) => void;
+  onObjectFlyTo?: (object: any) => void;
 }
 
 export function ObjectListSidebar({
   className,
   isOpen,
+  selectedObjectId,
+  onObjectSelect,
+  onObjectFlyTo,
   ...props
 }: ObjectListSidebarProps) {
   const objects = useObjectsStore((state) => state.objects);
   const loading = useObjectsStore((state) => state.loading);
   const error = useObjectsStore((state) => state.error);
   const loadObjects = useObjectsStore((state) => state.loadObjects);
-
   const {
     selectedDesignations,
     searchQuery,
@@ -62,9 +67,12 @@ export function ObjectListSidebar({
           objectCount={objects.length}
           groupedObjects={groupedObjects}
           selectedDesignations={selectedDesignations}
+          selectedObjectId={selectedObjectId}
           isSectionOpen={isSectionOpen}
           onToggleSection={toggleSection}
           onRetry={loadObjects}
+          onObjectSelect={onObjectSelect}
+          onObjectFlyTo={onObjectFlyTo}
         />
       </div>
     </div>

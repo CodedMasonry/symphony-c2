@@ -14,11 +14,20 @@ import {
 
 interface ObjectCardProps {
   object: ProtoObject & { ulidString: string };
+  isSelected?: boolean;
+  onClick?: () => void;
 }
 
-export function ObjectCard({ object }: ObjectCardProps) {
+export function ObjectCard({ object, isSelected, onClick }: ObjectCardProps) {
   return (
-    <Card className="bg-accent/20 hover:bg-accent/40 transition-colors cursor-default">
+    <Card
+      className={`transition-colors cursor-pointer ${
+        isSelected
+          ? "bg-accent/60 border-primary border-2"
+          : "bg-accent/20 hover:bg-accent/40"
+      }`}
+      onClick={onClick}
+    >
       <CardHeader>
         <div className="flex items-start justify-between">
           <CardTitle className="text-sm font-medium">

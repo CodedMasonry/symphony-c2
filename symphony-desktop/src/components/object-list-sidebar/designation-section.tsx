@@ -23,6 +23,9 @@ interface DesignationSectionProps {
   objects: Array<ProtoObject & { ulidString: string }>;
   isOpen: boolean;
   onToggle: () => void;
+  selectedObjectId?: string | null;
+  onObjectSelect?: (objectId: string | null) => void;
+  onObjectFlyTo?: (object: any) => void;
 }
 
 export function DesignationSection({
@@ -30,7 +33,15 @@ export function DesignationSection({
   objects,
   isOpen,
   onToggle,
+  selectedObjectId,
+  onObjectSelect,
+  onObjectFlyTo,
 }: DesignationSectionProps) {
+  const handleCardClick = (obj: ProtoObject & { ulidString: string }) => {
+    onObjectSelect?.(obj.ulidString);
+    onObjectFlyTo?.(obj);
+  };
+
   return (
     <Collapsible open={isOpen} onOpenChange={onToggle}>
       <div className="space-y-2">
@@ -62,9 +73,12 @@ export function DesignationSection({
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-2 px-1">
           {objects.map((obj) => (
-            <div key={obj.ulidString}>
-              <ObjectCard key={obj.ulidString} object={obj} />
-            </div>
+            <ObjectCard
+              key={obj.ulidString}
+              object={obj}
+              isSelected={selectedObjectId === obj.ulidString}
+              onClick={() => handleCardClick(obj)}
+            />
           ))}
         </CollapsibleContent>
       </div>

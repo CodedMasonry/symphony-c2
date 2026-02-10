@@ -13,9 +13,12 @@ interface SidebarContentProps {
   objectCount: number;
   groupedObjects: Map<ObjectDesignation, any[]>;
   selectedDesignations: ObjectDesignation[];
+  selectedObjectId?: string | null;
   isSectionOpen: (designation: ObjectDesignation) => boolean;
   onToggleSection: (designation: ObjectDesignation) => void;
   onRetry: () => void;
+  onObjectSelect?: (objectId: string | null) => void;
+  onObjectFlyTo?: (object: any) => void;
 }
 
 export function SidebarContent({
@@ -24,9 +27,12 @@ export function SidebarContent({
   objectCount,
   groupedObjects,
   selectedDesignations,
+  selectedObjectId,
   isSectionOpen,
   onToggleSection,
   onRetry,
+  onObjectSelect,
+  onObjectFlyTo,
 }: SidebarContentProps) {
   if (loading && objectCount === 0) {
     return (
@@ -86,11 +92,9 @@ export function SidebarContent({
           {DESIGNATION_ORDER.map((designation) => {
             const objectsInGroup = groupedObjects.get(designation);
             const isVisible = selectedDesignations.includes(designation);
-
             if (!objectsInGroup || objectsInGroup.length === 0 || !isVisible) {
               return null;
             }
-
             return (
               <DesignationSection
                 key={designation}
@@ -98,6 +102,9 @@ export function SidebarContent({
                 objects={objectsInGroup}
                 isOpen={isSectionOpen(designation)}
                 onToggle={() => onToggleSection(designation)}
+                selectedObjectId={selectedObjectId}
+                onObjectSelect={onObjectSelect}
+                onObjectFlyTo={onObjectFlyTo}
               />
             );
           })}

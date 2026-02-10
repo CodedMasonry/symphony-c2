@@ -71,6 +71,7 @@ interface Options {
   viewer: Cesium.Viewer | null;
   selectedObjectId?: string | null;
   onObjectClick?: (o: ObjectWithUlid | null) => void;
+  onObjectDoubleClick?: (o: ObjectWithUlid | null) => void;
   onObjectHover?: (
     o: ObjectWithUlid | null,
     position: { x: number; y: number } | null,
@@ -81,6 +82,7 @@ export function useCesiumObjects({
   viewer,
   selectedObjectId,
   onObjectClick,
+  onObjectDoubleClick,
   onObjectHover,
 }: Options) {
   const objects = useObjectsStore((s) => s.objects);
@@ -89,10 +91,12 @@ export function useCesiumObjects({
 
   // Use refs to avoid recreating event handlers when callbacks change
   const onObjectClickRef = useRef(onObjectClick);
+  const onObjectDoubleClickRef = useRef(onObjectDoubleClick);
   const onObjectHoverRef = useRef(onObjectHover);
 
   useEffect(() => {
     onObjectClickRef.current = onObjectClick;
+    onObjectDoubleClickRef.current = onObjectDoubleClick;
     onObjectHoverRef.current = onObjectHover;
   });
 
@@ -161,7 +165,7 @@ export function useCesiumObjects({
 
     let hoveredEntity: Cesium.Entity | null = null;
 
-    // Click handler
+    // Single click handler
     clickHandler.current.setInputAction((m) => {
       // Clear hover state on click
       if (hoveredEntity) {
@@ -179,6 +183,16 @@ export function useCesiumObjects({
       }
       viewer.scene.requestRender();
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+    // Double click handler
+    clickHandler.current.setInputAction((m) => {
+      const picked = viewer.scene.pick(m.position);
+      const obj = picked?.id?.properties?.objectData?.getValue() ?? null;
+      if (onObjectDoubleClickRef.current) {
+        onObjectDoubleClickRef.current(obj);
+      }
+      viewer.scene.requestRender();
+    }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
 
     // Hover handler
     clickHandler.current.setInputAction((movement) => {
