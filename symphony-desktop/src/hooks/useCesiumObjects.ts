@@ -71,16 +71,30 @@ interface Options {
   viewer: Cesium.Viewer | null;
   selectedObjectId?: string | null;
   onObjectClick?: (o: ObjectWithUlid | null) => void;
+  onObjectHover?: (
+    o: ObjectWithUlid | null,
+    position: { x: number; y: number } | null,
+  ) => void;
 }
 
 export function useCesiumObjects({
   viewer,
   selectedObjectId,
   onObjectClick,
+  onObjectHover,
 }: Options) {
   const objects = useObjectsStore((s) => s.objects);
   const entityMap = useRef(new Map<string, Cesium.Entity>());
   const clickHandler = useRef<Cesium.ScreenSpaceEventHandler | null>(null);
+
+  // Use refs to avoid recreating event handlers when callbacks change
+  const onObjectClickRef = useRef(onObjectClick);
+  const onObjectHoverRef = useRef(onObjectHover);
+
+  useEffect(() => {
+    onObjectClickRef.current = onObjectClick;
+    onObjectHoverRef.current = onObjectHover;
+  });
 
   useEffect(() => {
     if (!viewer) return;
@@ -136,24 +150,90 @@ export function useCesiumObjects({
     };
   }, [viewer, objects, selectedObjectId]);
 
-  /* ───────────── Click Handling ───────────── */
+  /* ───────────── Click & Hover Handling ───────────── */
 
   useEffect(() => {
-    if (!viewer || !onObjectClick || clickHandler.current) return;
+    if (!viewer || clickHandler.current) return;
 
     clickHandler.current = new Cesium.ScreenSpaceEventHandler(
       viewer.scene.canvas,
     );
 
+    let hoveredEntity: Cesium.Entity | null = null;
+
+    // Click handler
     clickHandler.current.setInputAction((m) => {
+      // Clear hover state on click
+      if (hoveredEntity) {
+        hoveredEntity.billboard!.scale = new Cesium.ConstantProperty(1.0);
+        if (onObjectHoverRef.current) {
+          onObjectHoverRef.current(null, null);
+        }
+        hoveredEntity = null;
+      }
+
       const picked = viewer.scene.pick(m.position);
       const obj = picked?.id?.properties?.objectData?.getValue() ?? null;
-      onObjectClick(obj);
+      if (onObjectClickRef.current) {
+        onObjectClickRef.current(obj);
+      }
+      viewer.scene.requestRender();
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
+    // Hover handler
+    clickHandler.current.setInputAction((movement) => {
+      viewer.scene.requestRender();
+
+      const picked = viewer.scene.pick(movement.endPosition);
+      const newHovered = picked?.id ?? null;
+
+      if (hoveredEntity !== newHovered) {
+        // Mouse moved to different entity or empty space
+        if (hoveredEntity) {
+          hoveredEntity.billboard!.scale = new Cesium.ConstantProperty(1.0);
+        }
+
+        if (newHovered && newHovered.billboard) {
+          // Mouse entered new entity
+          newHovered.billboard.scale = new Cesium.ConstantProperty(1.15);
+          viewer.scene.canvas.style.cursor = "pointer";
+
+          const obj = newHovered.properties?.objectData?.getValue();
+          if (obj && onObjectHoverRef.current) {
+            onObjectHoverRef.current(obj, {
+              x: movement.endPosition.x,
+              y: movement.endPosition.y,
+            });
+          }
+        } else {
+          viewer.scene.canvas.style.cursor = "default";
+          if (onObjectHoverRef.current) {
+            onObjectHoverRef.current(null, null);
+          }
+        }
+
+        hoveredEntity = newHovered;
+      } else if (newHovered && onObjectHoverRef.current) {
+        // Same entity, update position
+        const obj = newHovered.properties?.objectData?.getValue();
+        if (obj) {
+          onObjectHoverRef.current(obj, {
+            x: movement.endPosition.x,
+            y: movement.endPosition.y,
+          });
+        }
+      }
+    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
     return () => {
+      if (viewer.scene.canvas) {
+        viewer.scene.canvas.style.cursor = "default";
+      }
+      if (onObjectHoverRef.current) {
+        onObjectHoverRef.current(null, null);
+      }
       clickHandler.current?.destroy();
       clickHandler.current = null;
     };
-  }, [viewer, onObjectClick]);
+  }, [viewer]);
 }
