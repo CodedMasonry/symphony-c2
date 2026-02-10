@@ -15,6 +15,7 @@ tokio = "1.49.0"
 ulid = "1.2.1"
 zenoh = "1.7.2"
 symphony-types = { version = "=0.1.0", path = "symphony-types" }
+rand = "0.10.0"
 
 [profile.dev]
 incremental = true # Compile your binary in smaller steps.

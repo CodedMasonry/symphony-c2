@@ -51,9 +51,11 @@ export default function CesiumMap({
     viewer.scene.maximumRenderTimeChange = Infinity;
     viewer.scene.globe.depthTestAgainstTerrain = true;
     viewer.camera.setView({
-      destination: Cesium.Cartesian3.fromDegrees(-119, 30, 800_000),
+      destination: Cesium.Cartesian3.fromDegrees(-75.0, 25.0, 2000000), // Long, Lat, Height (meters)
       orientation: {
-        pitch: Cesium.Math.toRadians(-45),
+        heading: Cesium.Math.toRadians(0.0),
+        pitch: Cesium.Math.toRadians(-60.0),
+        roll: 0.0,
       },
     });
     viewerRef.current = viewer;
