@@ -125,7 +125,7 @@ export function useCesiumObjects({
             id: obj.ulidString,
             position: new Cesium.ConstantPositionProperty(position),
             billboard: {
-              image: icon,
+              image: new Cesium.ConstantProperty(icon),
               verticalOrigin: Cesium.VerticalOrigin.CENTER,
               disableDepthTestDistance: Infinity,
               scale: new Cesium.ConstantProperty(1.0),
@@ -142,7 +142,7 @@ export function useCesiumObjects({
           entityMap.current.set(obj.ulidString, entity);
         } else {
           entity.position = new Cesium.ConstantPositionProperty(position);
-          entity.billboard!.image = icon;
+          entity.billboard!.image = new Cesium.ConstantProperty(icon);
         }
       }
 
@@ -166,78 +166,87 @@ export function useCesiumObjects({
     let hoveredEntity: Cesium.Entity | null = null;
 
     // Single click handler
-    clickHandler.current.setInputAction((m) => {
-      // Clear hover state on click
-      if (hoveredEntity) {
-        hoveredEntity.billboard!.scale = new Cesium.ConstantProperty(1.0);
-        if (onObjectHoverRef.current) {
-          onObjectHoverRef.current(null, null);
-        }
-        hoveredEntity = null;
-      }
-
-      const picked = viewer.scene.pick(m.position);
-      const obj = picked?.id?.properties?.objectData?.getValue() ?? null;
-      if (onObjectClickRef.current) {
-        onObjectClickRef.current(obj);
-      }
-      viewer.scene.requestRender();
-    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-    // Double click handler
-    clickHandler.current.setInputAction((m) => {
-      const picked = viewer.scene.pick(m.position);
-      const obj = picked?.id?.properties?.objectData?.getValue() ?? null;
-      if (onObjectDoubleClickRef.current) {
-        onObjectDoubleClickRef.current(obj);
-      }
-      viewer.scene.requestRender();
-    }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
-
-    // Hover handler
-    clickHandler.current.setInputAction((movement) => {
-      viewer.scene.requestRender();
-
-      const picked = viewer.scene.pick(movement.endPosition);
-      const newHovered = picked?.id ?? null;
-
-      if (hoveredEntity !== newHovered) {
-        // Mouse moved to different entity or empty space
+    clickHandler.current.setInputAction(
+      (click: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
+        // Clear hover state on click
         if (hoveredEntity) {
           hoveredEntity.billboard!.scale = new Cesium.ConstantProperty(1.0);
+          if (onObjectHoverRef.current) {
+            onObjectHoverRef.current(null, null);
+          }
+          hoveredEntity = null;
         }
 
-        if (newHovered && newHovered.billboard) {
-          // Mouse entered new entity
-          newHovered.billboard.scale = new Cesium.ConstantProperty(1.15);
-          viewer.scene.canvas.style.cursor = "pointer";
+        const picked = viewer.scene.pick(click.position);
+        const obj = picked?.id?.properties?.objectData?.getValue() ?? null;
+        if (onObjectClickRef.current) {
+          onObjectClickRef.current(obj);
+        }
+        viewer.scene.requestRender();
+      },
+      Cesium.ScreenSpaceEventType.LEFT_CLICK,
+    );
 
+    // Double click handler
+    clickHandler.current.setInputAction(
+      (click: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
+        const picked = viewer.scene.pick(click.position);
+        const obj = picked?.id?.properties?.objectData?.getValue() ?? null;
+        if (onObjectDoubleClickRef.current) {
+          onObjectDoubleClickRef.current(obj);
+        }
+        viewer.scene.requestRender();
+      },
+      Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK,
+    );
+
+    // Hover handler
+    clickHandler.current.setInputAction(
+      (movement: Cesium.ScreenSpaceEventHandler.MotionEvent) => {
+        viewer.scene.requestRender();
+
+        const picked = viewer.scene.pick(movement.endPosition);
+        const newHovered = picked?.id ?? null;
+
+        if (hoveredEntity !== newHovered) {
+          // Mouse moved to different entity or empty space
+          if (hoveredEntity) {
+            hoveredEntity.billboard!.scale = new Cesium.ConstantProperty(1.0);
+          }
+
+          if (newHovered && newHovered.billboard) {
+            // Mouse entered new entity
+            newHovered.billboard.scale = new Cesium.ConstantProperty(1.15);
+            viewer.scene.canvas.style.cursor = "pointer";
+
+            const obj = newHovered.properties?.objectData?.getValue();
+            if (obj && onObjectHoverRef.current) {
+              onObjectHoverRef.current(obj, {
+                x: movement.endPosition.x,
+                y: movement.endPosition.y,
+              });
+            }
+          } else {
+            viewer.scene.canvas.style.cursor = "default";
+            if (onObjectHoverRef.current) {
+              onObjectHoverRef.current(null, null);
+            }
+          }
+
+          hoveredEntity = newHovered;
+        } else if (newHovered && onObjectHoverRef.current) {
+          // Same entity, update position
           const obj = newHovered.properties?.objectData?.getValue();
-          if (obj && onObjectHoverRef.current) {
+          if (obj) {
             onObjectHoverRef.current(obj, {
               x: movement.endPosition.x,
               y: movement.endPosition.y,
             });
           }
-        } else {
-          viewer.scene.canvas.style.cursor = "default";
-          if (onObjectHoverRef.current) {
-            onObjectHoverRef.current(null, null);
-          }
         }
-
-        hoveredEntity = newHovered;
-      } else if (newHovered && onObjectHoverRef.current) {
-        // Same entity, update position
-        const obj = newHovered.properties?.objectData?.getValue();
-        if (obj) {
-          onObjectHoverRef.current(obj, {
-            x: movement.endPosition.x,
-            y: movement.endPosition.y,
-          });
-        }
-      }
-    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+      },
+      Cesium.ScreenSpaceEventType.MOUSE_MOVE,
+    );
 
     return () => {
       if (viewer.scene.canvas) {

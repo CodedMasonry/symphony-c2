@@ -9,7 +9,7 @@ import { ObjectHoverCard } from "@/components/map/object-hover-card";
 interface CesiumMapProps extends React.ComponentProps<"div"> {
   selectedObjectId?: string | null;
   onObjectSelect?: (objectId: string | null) => void;
-  viewerRef?: React.MutableRefObject<Cesium.Viewer | null>;
+  viewerRef?: { current: Cesium.Viewer | null };
 }
 
 export default function CesiumMap({
@@ -32,7 +32,7 @@ export default function CesiumMap({
 
   useEffect(() => {
     if (!containerRef.current || viewerRef.current) return;
-    window.CESIUM_BASE_URL = "/cesiumStatic";
+    (window as any).CESIUM_BASE_URL = "/cesiumStatic";
     Cesium.Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_ION_TOKEN;
     const viewer = new Cesium.Viewer(containerRef.current, {
       terrain: Cesium.Terrain.fromWorldTerrain(),
@@ -72,7 +72,7 @@ export default function CesiumMap({
     [onObjectSelect],
   );
 
-  // Handle double click - select and fly to (handled by hook)
+  // Handle double click - select and fly to
   const handleDoubleClick = useCallback(
     (obj: ObjectWithUlid | null) => {
       if (!obj || !viewerRef.current) return;
