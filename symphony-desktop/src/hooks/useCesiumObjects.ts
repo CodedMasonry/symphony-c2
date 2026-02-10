@@ -31,34 +31,63 @@ async function buildIcon(obj: ObjectWithUlid, selected: boolean) {
   canvas.height = 64;
   const ctx = canvas.getContext("2d")!;
 
+  // CONFIG: Adjust this to change the "gap"
+  const PADDING = 4;
+  const ICON_SIZE = 64 - PADDING * 2;
+
+  // 1. Draw Base Icon (Shrunk & Centered)
   const base = getBaseIcon(obj.objectType);
   if (base) {
     const img = await loadImage(base);
-    ctx.drawImage(img, 0, 0, 64, 64);
+    // Draw centered with padding
+    ctx.drawImage(img, PADDING, PADDING, ICON_SIZE, ICON_SIZE);
+
     ctx.globalCompositeOperation = "source-atop";
     ctx.fillStyle = getDesignationColor(obj.designation);
-    ctx.fillRect(0, 0, 64, 64);
+    // Color only the shrunken icon area
+    ctx.fillRect(PADDING, PADDING, ICON_SIZE, ICON_SIZE);
     ctx.globalCompositeOperation = "source-over";
   }
 
+  // 2. Selection "Pipes" (Moved to the very edges)
   if (selected) {
-    const fg = getComputedStyle(document.documentElement)
-      .getPropertyValue("--foreground")
-      .trim();
+    const primary =
+      getComputedStyle(document.documentElement)
+        .getPropertyValue("--primary")
+        .trim() || "#ffffff";
 
-    ctx.strokeStyle = fg || "#ffffff";
+    ctx.strokeStyle = primary;
     ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+
+    // Draw pipes at x=2 and x=62 to maximize distance from icon
     ctx.beginPath();
-    ctx.arc(32, 32, 28, 0, Math.PI * 2);
+    ctx.moveTo(3, 12);
+    ctx.lineTo(3, 52); // Left Pipe
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(61, 12);
+    ctx.lineTo(61, 52); // Right Pipe
     ctx.stroke();
   }
 
+  // 3. Engaged Status (Large Outer Dashed Circle)
   if (obj.status === ObjectStatus.OBJECT_STATUS_ENGAGED) {
-    ctx.strokeStyle = "#ef4444";
-    ctx.lineWidth = 3;
+    const destructive =
+      getComputedStyle(document.documentElement)
+        .getPropertyValue("--destructive")
+        .trim() || "#ef4444";
+
+    ctx.strokeStyle = destructive;
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([5, 3]);
+
     ctx.beginPath();
-    ctx.arc(32, 32, 24, 0, Math.PI * 2);
+    // Radius 30 (60px wide) keeps it outside the 40px icon (12px padding)
+    ctx.arc(32, 32, 30, 0, Math.PI * 2);
     ctx.stroke();
+    ctx.setLineDash([]);
   }
 
   iconCache.set(key, canvas);
