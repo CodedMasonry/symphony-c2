@@ -50,7 +50,7 @@ export function ObjectListSidebar({
       {...props}
     >
       {/* Main Sidebar Panel */}
-      <div className="flex flex-col h-full w-80 bg-background/95 border-2 border-border/95 overflow-hidden">
+      <div className="flex flex-col h-full w-80 pb-2 bg-background/95 border-2 border-border/95 overflow-hidden">
         <SidebarHeader
           objectCount={objects.length}
           filteredCount={filteredCount}
