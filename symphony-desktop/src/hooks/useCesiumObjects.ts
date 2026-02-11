@@ -160,9 +160,9 @@ export function useCesiumObjects({
               scale: new Cesium.ConstantProperty(1.0),
               scaleByDistance: new Cesium.NearFarScalar(
                 2_000,
-                1.1,
+                1.5,
                 600_000,
-                0.25,
+                0.5,
               ),
             },
             properties: { objectData: obj },
