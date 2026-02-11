@@ -96,7 +96,7 @@ export default function CesiumMap({
           duration: 1.1,
           offset: new Cesium.HeadingPitchRange(
             viewer.camera.heading,
-            Cesium.Math.toRadians(-35),
+            Cesium.Math.toRadians(-75),
             20_000,
           ),
         },
