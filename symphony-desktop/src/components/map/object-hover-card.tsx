@@ -1,75 +1,22 @@
 import { Badge } from "@/components/ui/badge";
 import { ObjectWithUlid } from "@/lib/proto_api";
 import { SymbolSet, StandardIdentity } from "@/generated/base";
+import { IDENTITY_CONFIG, SYMBOL_SET_CONFIG } from "../constants";
 
 interface ObjectHoverCardProps {
   object: ObjectWithUlid;
   position: { x: number; y: number };
 }
 
-/* ───────────────────────── Helpers ───────────────────────── */
-
-function getSymbolSetLabel(symbolSet: SymbolSet): string {
-  switch (symbolSet) {
-    case SymbolSet.SYMBOL_SET_AIR:
-      return "AIR";
-    case SymbolSet.SYMBOL_SET_AIR_MISSILE:
-      return "MSL";
-    case SymbolSet.SYMBOL_SET_SPACE:
-      return "SPC";
-    case SymbolSet.SYMBOL_SET_LAND_UNIT:
-      return "LND";
-    case SymbolSet.SYMBOL_SET_LAND_CIVILIAN:
-      return "CIV";
-    case SymbolSet.SYMBOL_SET_LAND_EQUIPMENT:
-      return "EQP";
-    case SymbolSet.SYMBOL_SET_SEA_SURFACE:
-      return "SEA";
-    case SymbolSet.SYMBOL_SET_SEA_SUBSURFACE:
-      return "SUB";
-    case SymbolSet.SYMBOL_SET_ACTIVITIES:
-      return "ACT";
-    case SymbolSet.SYMBOL_SET_INSTALLATIONS:
-      return "INS";
-    default:
-      return "UNK";
-  }
-}
-
-function getIdentityBadgeVariant(identity: StandardIdentity) {
-  switch (identity) {
-    case StandardIdentity.STANDARD_IDENTITY_HOSTILE:
-      return "destructive" as const;
-    case StandardIdentity.STANDARD_IDENTITY_FRIEND:
-    case StandardIdentity.STANDARD_IDENTITY_ASSUMED_FRIEND:
-      return "secondary" as const;
-    default:
-      return "outline" as const;
-  }
-}
-
-function getIdentityColor(identity: StandardIdentity): string {
-  switch (identity) {
-    case StandardIdentity.STANDARD_IDENTITY_HOSTILE:
-      return "text-destructive";
-    case StandardIdentity.STANDARD_IDENTITY_FRIEND:
-      return "bg-blue-500/20 text-blue-400";
-    case StandardIdentity.STANDARD_IDENTITY_ASSUMED_FRIEND:
-      return "bg-sky-500/20 text-sky-400";
-    case StandardIdentity.STANDARD_IDENTITY_NEUTRAL:
-      return "bg-green-500/20 text-green-400";
-    case StandardIdentity.STANDARD_IDENTITY_PENDING:
-      return "bg-yellow-500/20 text-yellow-400";
-    case StandardIdentity.STANDARD_IDENTITY_SUSPECT:
-      return "bg-red-500/10 text-red-400";
-    default:
-      return "";
-  }
-}
-
-/* ───────────────────────── Component ───────────────────────── */
-
 export function ObjectHoverCard({ object, position }: ObjectHoverCardProps) {
+  const identity =
+    IDENTITY_CONFIG[object.standardIdentity] ??
+    IDENTITY_CONFIG[StandardIdentity.STANDARD_IDENTITY_UNSPECIFIED];
+
+  const symbolSet =
+    SYMBOL_SET_CONFIG[object.symbolSet] ??
+    SYMBOL_SET_CONFIG[SymbolSet.SYMBOL_SET_UNSPECIFIED];
+
   return (
     <div
       className="fixed pointer-events-none z-50"
@@ -78,31 +25,47 @@ export function ObjectHoverCard({ object, position }: ObjectHoverCardProps) {
         top: `${position.y + 16}px`,
       }}
     >
-      <div className="bg-background/90 backdrop-blur-sm border rounded-md shadow-lg px-2.5 py-1.5 space-y-1 max-w-50">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-medium truncate">
-            {object.callsign || object.model || "Unnamed Object"}
+      <div
+        className={[
+          "bg-background/95 backdrop-blur-sm shadow-xl rounded-md",
+          "border border-border/60 border-l-[3px]",
+          identity.border,
+          "px-2.5 py-2 space-y-1.5 min-w-[140px] max-w-[200px]",
+        ].join(" ")}
+      >
+        {/* Row 1: name + affiliation (dominant) */}
+        <div className="flex items-start justify-between gap-2">
+          <span className="text-xs font-semibold leading-snug truncate">
+            {object.callsign || object.model || "Unnamed"}
           </span>
-
           <Badge
-            variant={getIdentityBadgeVariant(object.standardIdentity)}
-            className={`${getIdentityColor(
-              object.standardIdentity,
-            )} text-[10px] px-1 py-0 h-4`}
+            variant="outline"
+            className={`shrink-0 text-[10px] px-1.5 py-0 h-4 ${identity.badge}`}
           >
-            {getSymbolSetLabel(object.symbolSet)}
+            {identity.label}
           </Badge>
         </div>
 
-        {object.model && (
-          <p className="text-[10px] text-muted-foreground truncate">
-            {object.model}
-          </p>
-        )}
+        {/* Row 2: model + domain type (secondary) */}
+        <div className="flex items-center justify-between gap-2">
+          {object.model && (
+            <span className="text-[10px] text-muted-foreground truncate">
+              {object.model}
+            </span>
+          )}
+          <Badge
+            variant="outline"
+            className={`shrink-0 ml-auto text-[9px] px-1.5 py-0 h-3.5 ${symbolSet.badge}`}
+          >
+            {symbolSet.shortLabel}
+          </Badge>
+        </div>
 
-        <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+        {/* Row 3: kinematics */}
+        <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-0.5 border-t border-border/30">
           <span>{object.altitude.toFixed(0)} ft</span>
           <span>{object.heading.toFixed(0)}°</span>
+          {object.speed != null && <span>{object.speed.toFixed(0)} kts</span>}
         </div>
       </div>
     </div>

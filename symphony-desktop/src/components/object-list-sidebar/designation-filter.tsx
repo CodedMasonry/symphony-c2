@@ -1,21 +1,25 @@
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Filter } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { StandardIdentity } from "@/generated/base";
 import { getIdentityName } from "@/lib/proto_api";
-import { IDENTITY_ORDER, IDENTITY_CONFIG } from "./constants";
-import { cn } from "@/lib/utils";
+import {
+  IDENTITY_ORDER,
+  IDENTITY_CONFIG,
+  DEFAULT_SELECTED_IDENTITIES,
+} from "../constants";
 
 interface DesignationFilterProps {
-  // Using StandardIdentity to match your updated useSidebarState hook
   onToggleDesignation: (identity: StandardIdentity) => void;
   isDesignationChecked: (identity: StandardIdentity) => boolean;
 }
@@ -24,38 +28,60 @@ export function DesignationFilter({
   onToggleDesignation,
   isDesignationChecked,
 }: DesignationFilterProps) {
+  const checkedCount = IDENTITY_ORDER.filter(isDesignationChecked).length;
+  const isFiltered = checkedCount !== DEFAULT_SELECTED_IDENTITIES.length;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="w-full justify-start">
+        <Button
+          variant="outline"
+          size="sm"
+          className={[
+            "w-full justify-start gap-2 text-xs",
+            isFiltered
+              ? "border-primary/50 text-primary"
+              : "text-muted-foreground",
+          ].join(" ")}
+        >
           <HugeiconsIcon
             icon={Filter}
             strokeWidth={2}
-            className="h-4 w-4 mr-2"
+            className="h-3.5 w-3.5 shrink-0"
           />
-          Filter Identities
+          <span className="flex-1 text-left">Filter</span>
+
+          {/* Show how many identity types are active */}
+          <Badge
+            variant={isFiltered ? "default" : "secondary"}
+            className="h-4 px-1.5 text-[10px] font-normal ml-auto"
+          >
+            {checkedCount}/{IDENTITY_ORDER.length}
+          </Badge>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
+
+      <DropdownMenuContent align="start" className="w-52">
+        <DropdownMenuLabel className="text-[10px] font-normal text-muted-foreground uppercase tracking-wider pb-1">
+          Standard Identity (2525E)
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Standard Identity (2525E)</DropdownMenuLabel>
           {IDENTITY_ORDER.map((identity) => {
             const config = IDENTITY_CONFIG[identity];
+            if (!config) return null;
 
             return (
               <DropdownMenuCheckboxItem
                 key={identity}
                 checked={isDesignationChecked(identity)}
                 onCheckedChange={() => onToggleDesignation(identity)}
-                className="flex items-center"
+                className="gap-2 text-xs cursor-pointer"
               >
-                {/* Visual indicator using the colors from your constants */}
+                {/* Solid dot from the dedicated `dot` field — no string splitting */}
                 <span
-                  className={cn(
-                    "h-2 w-2 rounded-full mr-2 shrink-0",
-                    // We extract the background color from your config
-                    config.color.split(" ")[0],
-                  )}
+                  className={`h-2 w-2 rounded-full shrink-0 ${config.dot}`}
                 />
                 <span className="flex-1">{getIdentityName(identity)}</span>
               </DropdownMenuCheckboxItem>

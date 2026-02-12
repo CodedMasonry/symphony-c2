@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Compass01Icon, MapPin } from "@hugeicons/core-free-icons";
@@ -8,6 +7,7 @@ import {
   SymbolSet,
   StandardIdentity,
 } from "@/generated/base";
+import { IDENTITY_CONFIG, SYMBOL_SET_CONFIG } from "../constants";
 import { formatTimestamp } from "./utils";
 
 interface ObjectCardProps {
@@ -16,146 +16,98 @@ interface ObjectCardProps {
   onClick?: () => void;
 }
 
-/* ───────────────────────── Helpers ───────────────────────── */
-
-function getSymbolSetLabel(symbolSet: SymbolSet): string {
-  switch (symbolSet) {
-    case SymbolSet.SYMBOL_SET_AIR:
-      return "AIR";
-    case SymbolSet.SYMBOL_SET_AIR_MISSILE:
-      return "MSL";
-    case SymbolSet.SYMBOL_SET_SPACE:
-      return "SPC";
-    case SymbolSet.SYMBOL_SET_LAND_UNIT:
-      return "LND";
-    case SymbolSet.SYMBOL_SET_LAND_CIVILIAN:
-      return "CIV";
-    case SymbolSet.SYMBOL_SET_LAND_EQUIPMENT:
-      return "EQP";
-    case SymbolSet.SYMBOL_SET_SEA_SURFACE:
-      return "SEA";
-    case SymbolSet.SYMBOL_SET_SEA_SUBSURFACE:
-      return "SUB";
-    case SymbolSet.SYMBOL_SET_ACTIVITIES:
-      return "ACT";
-    case SymbolSet.SYMBOL_SET_INSTALLATIONS:
-      return "INS";
-    default:
-      return "UNK";
-  }
-}
-
-function getIdentityBadgeVariant(identity: StandardIdentity) {
-  switch (identity) {
-    case StandardIdentity.STANDARD_IDENTITY_HOSTILE:
-      return "destructive" as const;
-    case StandardIdentity.STANDARD_IDENTITY_FRIEND:
-    case StandardIdentity.STANDARD_IDENTITY_ASSUMED_FRIEND:
-      return "secondary" as const;
-    case StandardIdentity.STANDARD_IDENTITY_NEUTRAL:
-      return "outline" as const;
-    case StandardIdentity.STANDARD_IDENTITY_PENDING:
-    case StandardIdentity.STANDARD_IDENTITY_SUSPECT:
-      return "outline" as const;
-    default:
-      return "outline" as const;
-  }
-}
-
-function getIdentityColor(identity: StandardIdentity): string {
-  switch (identity) {
-    case StandardIdentity.STANDARD_IDENTITY_HOSTILE:
-      return "text-destructive";
-    case StandardIdentity.STANDARD_IDENTITY_FRIEND:
-      return "bg-blue-500/20 text-blue-400";
-    case StandardIdentity.STANDARD_IDENTITY_ASSUMED_FRIEND:
-      return "bg-sky-500/20 text-sky-400";
-    case StandardIdentity.STANDARD_IDENTITY_NEUTRAL:
-      return "bg-green-500/20 text-green-400";
-    case StandardIdentity.STANDARD_IDENTITY_PENDING:
-      return "bg-yellow-500/20 text-yellow-400";
-    case StandardIdentity.STANDARD_IDENTITY_SUSPECT:
-      return "bg-red-500/10 text-red-400";
-    default:
-      return "";
-  }
-}
-
-/* ───────────────────────── Component ───────────────────────── */
-
 export function ObjectCard({ object, isSelected, onClick }: ObjectCardProps) {
-  return (
-    <Card
-      className={`transition-colors cursor-pointer ${
-        isSelected
-          ? "bg-accent/60 border-primary border-2"
-          : "bg-accent/20 hover:bg-accent/40"
-      }`}
-      onClick={onClick}
-    >
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-sm font-medium">
-            {object.callsign || object.model || "Unnamed Object"}
-          </CardTitle>
+  const identity =
+    IDENTITY_CONFIG[object.standardIdentity] ??
+    IDENTITY_CONFIG[StandardIdentity.STANDARD_IDENTITY_UNSPECIFIED];
 
-          {/* Symbol Set Badge */}
+  const symbolSet =
+    SYMBOL_SET_CONFIG[object.symbolSet] ??
+    SYMBOL_SET_CONFIG[SymbolSet.SYMBOL_SET_UNSPECIFIED];
+
+  return (
+    <div
+      onClick={onClick}
+      className={[
+        // Base card
+        "group relative rounded-md border-l-[3px] border border-border/50 cursor-pointer",
+        "bg-card/60 backdrop-blur-sm transition-all duration-150",
+        // Identity left-border (primary affiliation color signal)
+        identity.border,
+        // Selected state uses identity ring
+        isSelected
+          ? `ring-1 ${identity.ring} bg-card`
+          : "hover:bg-card/90 hover:border-border",
+      ].join(" ")}
+    >
+      <div className="px-3 py-2.5 space-y-2">
+        {/* ── Row 1: Callsign / name + affiliation badge (PRIMARY) ── */}
+        <div className="flex items-start justify-between gap-2">
+          <span className="text-xs font-semibold leading-tight truncate">
+            {object.callsign || object.model || "Unnamed Object"}
+          </span>
+
+          {/* Affiliation is the DOMINANT badge */}
           <Badge
-            variant={getIdentityBadgeVariant(object.standardIdentity)}
-            className={getIdentityColor(object.standardIdentity)}
+            variant="outline"
+            className={`shrink-0 text-[10px] font-medium px-1.5 py-0 h-4 ${identity.badge}`}
           >
-            {getSymbolSetLabel(object.symbolSet)}
+            {identity.label}
           </Badge>
         </div>
 
-        <div className="space-y-1">
-          {object.model && (
-            <p className="text-xs text-muted-foreground">{object.model}</p>
-          )}
-
-          <code className="text-xs text-muted-foreground font-mono">
-            {object.ulidString.slice(0, 6)}...
-            {object.ulidString.slice(object.ulidString.length - 6)}
-          </code>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-2">
-        {/* Position */}
-        <div className="flex items-center text-xs text-muted-foreground">
-          <HugeiconsIcon
-            icon={MapPin}
-            strokeWidth={2}
-            className="h-3 w-3 mr-1"
-          />
-          <span>
-            {object.latitude.toFixed(4)}°, {object.longitude.toFixed(4)}°
+        {/* ── Row 2: Model + symbol-set type badge (SECONDARY) ── */}
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[10px] text-muted-foreground truncate">
+            {object.model || (
+              <code className="font-mono">
+                {object.ulidString.slice(0, 6)}…{object.ulidString.slice(-4)}
+              </code>
+            )}
           </span>
+
+          {/* Symbol set is secondary, smaller, muted */}
+          <Badge
+            variant="outline"
+            className={`shrink-0 text-[9px] font-normal px-1.5 py-0 h-3.5 ${symbolSet.badge}`}
+          >
+            {symbolSet.shortLabel}
+          </Badge>
         </div>
 
-        {/* Heading & Altitude */}
-        <div className="flex items-center justify-between text-xs">
-          <div className="flex items-center text-muted-foreground">
+        <Separator className="opacity-30" />
+
+        {/* ── Row 3: Position + heading + altitude ── */}
+        <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+          <div className="flex items-center gap-1">
             <HugeiconsIcon
-              icon={Compass01Icon}
+              icon={MapPin}
               strokeWidth={2}
-              className="h-3 w-3 mr-1"
+              className="h-2.5 w-2.5 shrink-0"
             />
-            <span>{object.heading.toFixed(0)}°</span>
+            <span>
+              {object.latitude.toFixed(3)}°,&nbsp;{object.longitude.toFixed(3)}°
+            </span>
           </div>
 
-          <span className="text-muted-foreground">
-            {object.altitude.toFixed(0)} ft
-          </span>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0.5">
+              <HugeiconsIcon
+                icon={Compass01Icon}
+                strokeWidth={2}
+                className="h-2.5 w-2.5"
+              />
+              <span>{object.heading.toFixed(0)}°</span>
+            </div>
+            <span>{object.altitude.toFixed(0)} ft</span>
+          </div>
         </div>
 
-        <Separator />
-
-        {/* Timestamp */}
-        <p className="text-xs text-muted-foreground">
+        {/* ── Row 4: Timestamp ── */}
+        <p className="text-[9px] text-muted-foreground/60 tabular-nums">
           {formatTimestamp(object.createdAt)}
         </p>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
