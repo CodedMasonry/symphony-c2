@@ -30,7 +30,7 @@ export function ObjectHoverCard({ object, position }: ObjectHoverCardProps) {
           "bg-background/95 backdrop-blur-sm shadow-xl rounded-md",
           "border border-border/60 border-l-[3px]",
           identity.border,
-          "px-2.5 py-2 space-y-1.5 min-w-[140px] max-w-[200px]",
+          "px-2.5 py-2 space-y-1.5 min-w-35 max-w-50",
         ].join(" ")}
       >
         {/* Row 1: name + affiliation (dominant) */}

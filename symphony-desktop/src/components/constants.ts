@@ -208,4 +208,9 @@ export const SYMBOL_SET_CONFIG: Record<
     shortLabel: "UNK",
     badge: "bg-slate-800/60 text-slate-400 border-slate-600/40",
   },
+  [SymbolSet.UNRECOGNIZED]: {
+    label: "Unknown",
+    shortLabel: "UNK",
+    badge: "bg-slate-800/60 text-slate-400 border-slate-600/40",
+  },
 } as const;
