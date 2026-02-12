@@ -1,106 +1,84 @@
 import { useState, useMemo } from "react";
-import { ObjectDesignation, Object as ProtoObject } from "@/generated/base";
-import { DEFAULT_SELECTED_DESIGNATIONS } from "./constants";
+import { SymbolSet, StandardIdentity } from "@/generated/base";
+import { ObjectWithUlid as ObjectWithId } from "@/lib/proto_api";
+import { DEFAULT_SELECTED_IDENTITIES } from "./constants";
 
-export function useSidebarState(objects: ProtoObject[]) {
-  const [selectedDesignations, setSelectedDesignations] = useState<
-    ObjectDesignation[]
-  >(DEFAULT_SELECTED_DESIGNATIONS);
+export function useSidebarState(objects: ObjectWithId[]) {
+  const [selectedIdentities, setSelectedIdentities] = useState<
+    StandardIdentity[]
+  >(DEFAULT_SELECTED_IDENTITIES);
 
-  const [collapsedSections, setCollapsedSections] = useState<
-    Set<ObjectDesignation>
-  >(new Set(DEFAULT_SELECTED_DESIGNATIONS));
+  const [collapsedSections, setCollapsedSections] = useState<Set<SymbolSet>>(
+    new Set(),
+  );
 
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const toggleDesignation = (designation: ObjectDesignation) => {
-    setSelectedDesignations((prev) =>
-      prev.includes(designation)
-        ? prev.filter((d) => d !== designation)
-        : [...prev, designation],
+  const toggleIdentity = (identity: StandardIdentity) => {
+    setSelectedIdentities((prev) =>
+      prev.includes(identity)
+        ? prev.filter((i) => i !== identity)
+        : [...prev, identity],
     );
   };
 
-  const isDesignationChecked = (designation: ObjectDesignation) => {
-    return selectedDesignations.includes(designation);
+  const isIdentityChecked = (identity: StandardIdentity) => {
+    return selectedIdentities.includes(identity);
   };
 
-  const toggleSection = (designation: ObjectDesignation) => {
+  const toggleSection = (symbolSet: SymbolSet) => {
     setCollapsedSections((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(designation)) {
-        newSet.delete(designation);
-      } else {
-        newSet.add(designation);
-      }
+      if (newSet.has(symbolSet)) newSet.delete(symbolSet);
+      else newSet.add(symbolSet);
       return newSet;
     });
   };
 
-  const isSectionOpen = (designation: ObjectDesignation) => {
-    return !collapsedSections.has(designation);
+  const isSectionOpen = (symbolSet: SymbolSet) => {
+    return !collapsedSections.has(symbolSet);
   };
 
-  // Filter objects by search query
   const filteredObjects = useMemo(() => {
-    if (!searchQuery.trim()) return objects;
-
     const lowerQuery = searchQuery.toLowerCase().trim();
 
     return objects.filter((obj) => {
-      // Search by callsign (if available)
-      if (obj.callsign && obj.callsign.toLowerCase().includes(lowerQuery))
-        return true;
+      // 1. Filter by Affiliation (StandardIdentity)
+      if (!selectedIdentities.includes(obj.standardIdentity)) return false;
 
-      // Search by model (if available)
-      if (obj.model && obj.model.toLowerCase().includes(lowerQuery))
-        return true;
-
-      // Search by unit (if available)
-      if (obj.unit && obj.unit.toLowerCase().includes(lowerQuery)) return true;
-
-      // Search by coordinates (latitude, longitude)
-      if (obj.latitude.toString().includes(lowerQuery)) return true;
-      if (obj.longitude.toString().includes(lowerQuery)) return true;
-
-      // Search by altitude
-      if (obj.altitude.toString().includes(lowerQuery)) return true;
-
-      // Search by heading
-      if (obj.heading.toString().includes(lowerQuery)) return true;
-
-      // Search by speed (if available)
-      if (obj.speed && obj.speed.toString().includes(lowerQuery)) return true;
-
-      return false;
+      // 2. Filter by Search Query
+      if (!lowerQuery) return true;
+      return (
+        obj.callsign?.toLowerCase().includes(lowerQuery) ||
+        obj.model?.toLowerCase().includes(lowerQuery) ||
+        obj.unit?.toLowerCase().includes(lowerQuery) ||
+        obj.ulidString.toLowerCase().includes(lowerQuery)
+      );
     });
-  }, [objects, searchQuery]);
+  }, [objects, searchQuery, selectedIdentities]);
 
-  // Group and sort objects by designation
   const groupedObjects = useMemo(() => {
     const sortedObjects = [...filteredObjects].sort(
-      (a, b) => b.createdAt - a.createdAt,
+      (a, b) => Number(b.createdAt) - Number(a.createdAt),
     );
 
-    const groups = new Map<ObjectDesignation, ProtoObject[]>();
+    const groups = new Map<SymbolSet, ObjectWithId[]>();
 
     sortedObjects.forEach((obj) => {
-      if (!groups.has(obj.designation)) {
-        groups.set(obj.designation, []);
-      }
-      groups.get(obj.designation)!.push(obj);
+      const set = obj.symbolSet as SymbolSet;
+      if (!groups.has(set)) groups.set(set, []);
+      groups.get(set)!.push(obj);
     });
 
     return groups;
   }, [filteredObjects]);
 
   return {
-    selectedDesignations,
-    collapsedSections,
+    selectedIdentities,
     searchQuery,
     setSearchQuery,
-    toggleDesignation,
-    isDesignationChecked,
+    toggleIdentity,
+    isIdentityChecked,
     toggleSection,
     isSectionOpen,
     groupedObjects,

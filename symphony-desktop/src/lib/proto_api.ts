@@ -1,7 +1,8 @@
 import {
   Object as ProtoObject,
   ObjectList,
-  ObjectDesignation,
+  StandardIdentity, // Replacement for ObjectDesignation
+  SymbolSet, // Added for grouping
 } from "@/generated/base";
 import { invoke } from "@tauri-apps/api/core";
 import { bytesToUlid } from "@/lib/ulid";
@@ -18,7 +19,9 @@ export async function fetchObjects(): Promise<ObjectWithUlid[]> {
     const objectList = ObjectList.decode(uint8Array);
 
     return objectList.objects.map((obj) => {
-      const ulidString = bytesToUlid(obj.objectId);
+      // Note: Depending on your TS generator, objectId might be camelCase
+      // even if the proto is snake_case.
+      const ulidString = bytesToUlid(obj.objectId as Uint8Array);
 
       return {
         ...obj,
@@ -31,20 +34,48 @@ export async function fetchObjects(): Promise<ObjectWithUlid[]> {
   }
 }
 
-// Helper to get designation name
-export function getDesignationName(designation: ObjectDesignation): string {
-  switch (designation) {
-    case ObjectDesignation.OBJECT_DESIGNATION_UNSPECIFIED:
-      return "Unspecified";
-    case ObjectDesignation.OBJECT_DESIGNATION_HOSTILE:
+/**
+ * Maps StandardIdentity to human-readable strings
+ * Aligned with MIL-STD-2525E Affiliation
+ */
+export function getIdentityName(identity: StandardIdentity): string {
+  switch (identity) {
+    case StandardIdentity.STANDARD_IDENTITY_FRIEND:
+      return "Friend";
+    case StandardIdentity.STANDARD_IDENTITY_HOSTILE:
       return "Hostile";
-    case ObjectDesignation.OBJECT_DESIGNATION_CIVILIAN:
-      return "Civilian";
-    case ObjectDesignation.OBJECT_DESIGNATION_ALLY:
-      return "Ally";
-    case ObjectDesignation.OBJECT_DESIGNATION_FRIENDLY:
-      return "Friendly";
+    case StandardIdentity.STANDARD_IDENTITY_NEUTRAL:
+      return "Neutral";
+    case StandardIdentity.STANDARD_IDENTITY_PENDING:
+      return "Pending/Unknown";
+    case StandardIdentity.STANDARD_IDENTITY_ASSUMED_FRIEND:
+      return "Assumed Friend";
+    case StandardIdentity.STANDARD_IDENTITY_SUSPECT:
+      return "Suspect";
     default:
-      return "Unrecognized";
+      return "Unspecified";
+  }
+}
+
+/**
+ * Maps SymbolSet to human-readable strings
+ * Useful for the grouping logic in your sidebar
+ */
+export function getSymbolSetName(set: SymbolSet): string {
+  switch (set) {
+    case SymbolSet.SYMBOL_SET_AIR:
+      return "Air Tracks";
+    case SymbolSet.SYMBOL_SET_LAND_EQUIPMENT:
+      return "Land Equipment";
+    case SymbolSet.SYMBOL_SET_SEA_SURFACE:
+      return "Sea Surface";
+    case SymbolSet.SYMBOL_SET_SEA_SUBSURFACE:
+      return "Subsurface";
+    case SymbolSet.SYMBOL_SET_AIR_MISSILE:
+      return "Missiles";
+    case SymbolSet.SYMBOL_SET_INSTALLATIONS:
+      return "Installations";
+    default:
+      return "Other Tracks";
   }
 }

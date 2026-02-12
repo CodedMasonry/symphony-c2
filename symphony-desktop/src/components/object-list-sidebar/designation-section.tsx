@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -8,28 +7,42 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronRight } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ObjectDesignation } from "@/generated/base";
-import { getDesignationName } from "@/lib/proto_api";
+import { SymbolSet, Object as ProtoObject } from "@/generated/base";
 import { ObjectCard } from "./object-card";
-import { Object as ProtoObject } from "@/generated/base";
-import {
-  getDesignationVariant,
-  getDesignationColor,
-  getDesignationBadge,
-} from "./utils";
+
+type ObjectWithId = ProtoObject & { ulidString: string };
 
 interface DesignationSectionProps {
-  designation: ObjectDesignation;
-  objects: Array<ProtoObject & { ulidString: string }>;
+  symbolSet: SymbolSet;
+  objects: ObjectWithId[];
   isOpen: boolean;
   onToggle: () => void;
   selectedObjectId?: string | null;
   onObjectSelect?: (objectId: string | null) => void;
-  onObjectFlyTo?: (object: any) => void;
+  onObjectFlyTo?: (object: ObjectWithId) => void;
+}
+
+function getSymbolSetName(symbolSet: SymbolSet): string {
+  switch (symbolSet) {
+    case SymbolSet.SYMBOL_SET_AIR:
+      return "Air";
+    case SymbolSet.SYMBOL_SET_LAND_EQUIPMENT:
+      return "Land Equipment";
+    case SymbolSet.SYMBOL_SET_SEA_SURFACE:
+      return "Sea Surface";
+    case SymbolSet.SYMBOL_SET_SPACE:
+      return "Space";
+    case SymbolSet.SYMBOL_SET_ACTIVITIES:
+      return "Activities";
+    case SymbolSet.SYMBOL_SET_INSTALLATIONS:
+      return "Installations";
+    default:
+      return "Other";
+  }
 }
 
 export function DesignationSection({
-  designation,
+  symbolSet,
   objects,
   isOpen,
   onToggle,
@@ -37,7 +50,7 @@ export function DesignationSection({
   onObjectSelect,
   onObjectFlyTo,
 }: DesignationSectionProps) {
-  const handleCardClick = (obj: ProtoObject & { ulidString: string }) => {
+  const handleCardClick = (obj: ObjectWithId) => {
     onObjectSelect?.(obj.ulidString);
     onObjectFlyTo?.(obj);
   };
@@ -48,7 +61,7 @@ export function DesignationSection({
         <CollapsibleTrigger asChild>
           <Button
             variant="ghost"
-            className="w-full justify-between px-2 py-1 h-auto hover:bg-accent/50 data-[state=open]:bg-transparent"
+            className="w-full justify-between px-2 py-1 h-auto"
           >
             <div className="flex items-center gap-2">
               <HugeiconsIcon
@@ -57,20 +70,15 @@ export function DesignationSection({
                 className="h-4 w-4"
               />
               <span className="font-semibold text-sm">
-                {getDesignationName(designation)}
+                {getSymbolSetName(symbolSet)}
               </span>
               <Badge variant="secondary" className="ml-1 h-5 px-2 text-xs">
                 {objects.length}
               </Badge>
             </div>
-            <Badge
-              variant={getDesignationVariant(designation)}
-              className={cn("text-xs", getDesignationColor(designation))}
-            >
-              {getDesignationBadge(designation)}
-            </Badge>
           </Button>
         </CollapsibleTrigger>
+
         <CollapsibleContent className="space-y-2 px-1">
           {objects.map((obj) => (
             <ObjectCard

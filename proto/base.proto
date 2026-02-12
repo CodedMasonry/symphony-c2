@@ -2,131 +2,265 @@ syntax = "proto3";
 
 package base;
 
-/// Designation/alliance of an object in the simulation.
-enum ObjectDesignation {
-  OBJECT_DESIGNATION_UNSPECIFIED = 0;
-  OBJECT_DESIGNATION_HOSTILE = 1;
-  OBJECT_DESIGNATION_CIVILIAN = 2;
-  OBJECT_DESIGNATION_ALLY = 3;
-  OBJECT_DESIGNATION_FRIENDLY = 4;
+/// Standard Identity (Affiliation) aligned with MIL-STD-2525E
+enum StandardIdentity {
+  STANDARD_IDENTITY_UNSPECIFIED = 0;
+  STANDARD_IDENTITY_PENDING = 1; // Yellow - Pending/Unknown
+  STANDARD_IDENTITY_ASSUMED_FRIEND = 2; // Light Blue
+  STANDARD_IDENTITY_FRIEND = 3; // Blue - Friendly forces
+  STANDARD_IDENTITY_NEUTRAL = 4; // Green - Neutral/Civilian
+  STANDARD_IDENTITY_SUSPECT = 5; // Red outline - Suspect
+  STANDARD_IDENTITY_HOSTILE = 6; // Red - Hostile/Enemy forces
 }
 
-/// Type classification for objects in the simulation.
-enum ObjectType {
-  OBJECT_TYPE_UNSPECIFIED = 0;
-  OBJECT_TYPE_FIXED_WING = 1; // Fighter jets, bombers, transport aircraft
-  OBJECT_TYPE_ROTARY_WING = 2; // Helicopters
-  OBJECT_TYPE_GROUND_VEHICLE = 3; // Tanks, APCs, trucks
-  OBJECT_TYPE_NAVAL = 4; // Ships, boats
-  OBJECT_TYPE_INFANTRY = 5; // Ground troops
-  OBJECT_TYPE_UAV = 6; // Unmanned aerial vehicles
-  OBJECT_TYPE_MISSILE = 7; // Missiles, rockets
-  OBJECT_TYPE_STRUCTURE = 8; // Buildings, installations
+/// Symbol Set aligned with MIL-STD-2525E Appendix A
+enum SymbolSet {
+  SYMBOL_SET_UNSPECIFIED = 0;
+  SYMBOL_SET_AIR = 1; // Code 01 - Aircraft
+  SYMBOL_SET_AIR_MISSILE = 2; // Code 02 - Air Missiles
+  SYMBOL_SET_SPACE = 5; // Code 05 - Space
+  SYMBOL_SET_LAND_UNIT = 10; // Code 10 - Land Units
+  SYMBOL_SET_LAND_CIVILIAN = 11; // Code 11 - Land Civilian
+  SYMBOL_SET_LAND_EQUIPMENT = 15; // Code 15 - Land Equipment
+  SYMBOL_SET_SEA_SURFACE = 30; // Code 30 - Sea Surface
+  SYMBOL_SET_SEA_SUBSURFACE = 35; // Code 35 - Sea Subsurface
+  SYMBOL_SET_ACTIVITIES = 40; // Code 40 - Activities
+  SYMBOL_SET_INSTALLATIONS = 45; // Code 45 - Installations
 }
 
-/// Operational status of an object.
+/// Entity types for Air symbol set (MIL-STD-2525E)
+enum AirEntity {
+  AIR_ENTITY_UNSPECIFIED = 0;
+  AIR_ENTITY_MILITARY_AIRCRAFT = 1; // 11 - Fixed wing
+  AIR_ENTITY_CIVILIAN_AIRCRAFT = 2; // 12
+  AIR_ENTITY_MILITARY_HELICOPTER = 3; // 15 - Rotary wing
+  AIR_ENTITY_CIVILIAN_HELICOPTER = 4; // 16
+  AIR_ENTITY_UAV_FIXED_WING = 5; // 21 - UAS/Drone fixed wing
+  AIR_ENTITY_UAV_ROTARY_WING = 6; // 22 - UAS/Drone rotary wing
+  AIR_ENTITY_MISSILE = 7; // 41 - Missile
+  AIR_ENTITY_MISSILE_DECOY = 8; // 42
+}
+
+/// Entity types for Land Equipment
+enum LandEquipmentEntity {
+  LAND_EQUIPMENT_ENTITY_UNSPECIFIED = 0;
+  LAND_EQUIPMENT_ENTITY_ARMORED_VEHICLE = 1; // 12 - Armored fighting vehicle
+  LAND_EQUIPMENT_ENTITY_TANK = 2; // 13 - Tank
+  LAND_EQUIPMENT_ENTITY_APC = 3; // 14 - Armored personnel carrier
+  LAND_EQUIPMENT_ENTITY_TRUCK = 4; // 31 - Truck
+  LAND_EQUIPMENT_ENTITY_GROUND_STATION = 5; // Ground control station
+  LAND_EQUIPMENT_ENTITY_LAUNCHER = 6; // 41 - Missile launcher
+}
+
+/// Entity types for Sea Surface
+enum SeaEntity {
+  SEA_ENTITY_UNSPECIFIED = 0;
+  SEA_ENTITY_COMBATANT = 1; // 11 - Combatant
+  SEA_ENTITY_CARRIER = 2; // 12 - Aircraft carrier
+  SEA_ENTITY_CRUISER = 3; // 13
+  SEA_ENTITY_DESTROYER = 4; // 14
+  SEA_ENTITY_FRIGATE = 5; // 15
+  SEA_ENTITY_PATROL_CRAFT = 6; // 51
+  SEA_ENTITY_USV = 7; // Unmanned surface vehicle
+}
+
+/// Operational status of an object (MIL-STD-2525E Status codes)
 enum ObjectStatus {
   OBJECT_STATUS_UNSPECIFIED = 0;
-  OBJECT_STATUS_ACTIVE = 1; // Operational and mission-capable
-  OBJECT_STATUS_DAMAGED = 2; // Partially functional
-  OBJECT_STATUS_DESTROYED = 3; // Non-functional
-  OBJECT_STATUS_RETURNING = 4; // Returning to base
-  OBJECT_STATUS_STANDBY = 5; // On standby/idle
-  OBJECT_STATUS_ENGAGED = 6; // Currently in combat
+  OBJECT_STATUS_PRESENT = 1; // Present/Fully Capable
+  OBJECT_STATUS_PRESENT_DAMAGED = 2; // Present but damaged
+  OBJECT_STATUS_PRESENT_DESTROYED = 3; // Present but destroyed
+  OBJECT_STATUS_PRESENT_FULL_TO_CAPACITY = 4;
+  OBJECT_STATUS_ANTICIPATED = 5; // Planned/Anticipated
 }
 
-/// Base entity representing a trackable object (e.g., aircraft, unit).
+/// Context (Reality) - MIL-STD-2525E
+enum Context {
+  CONTEXT_UNSPECIFIED = 0;
+  CONTEXT_REALITY = 1; // Actual real-world entity
+  CONTEXT_EXERCISE = 2; // Exercise/Simulation entity
+  CONTEXT_SIMULATION = 3; // Pure simulation
+}
+
+/// Operational Condition Amplifier
+enum OperationalCondition {
+  OPERATIONAL_CONDITION_UNSPECIFIED = 0;
+  OPERATIONAL_CONDITION_FULLY_CAPABLE = 1;
+  OPERATIONAL_CONDITION_DAMAGED = 2;
+  OPERATIONAL_CONDITION_DESTROYED = 3;
+  OPERATIONAL_CONDITION_FULL_TO_CAPACITY = 4;
+}
+
+/// Echelon/Mobility indicator for units
+enum Echelon {
+  ECHELON_UNSPECIFIED = 0;
+  ECHELON_TEAM_CREW = 1; // Team/Crew
+  ECHELON_SQUAD = 2; // Squad
+  ECHELON_SECTION = 3; // Section
+  ECHELON_PLATOON_DETACHMENT = 4; // Platoon/Detachment
+  ECHELON_COMPANY = 5; // Company/Battery/Troop
+  ECHELON_BATTALION = 6; // Battalion/Squadron
+  ECHELON_REGIMENT = 7; // Regiment/Group
+  ECHELON_BRIGADE = 8; // Brigade
+  ECHELON_DIVISION = 9; // Division
+  ECHELON_CORPS = 10; // Corps
+  ECHELON_ARMY = 11; // Army
+}
+
+/// Base entity representing a trackable object with MIL-STD-2525E compliance
 message Object {
-  /// Unique identifier (16-byte binary ULID).
+  /// Unique identifier (16-byte binary ULID)
   bytes object_id = 1;
 
-  /// The alliance/designation of the entity.
-  ObjectDesignation designation = 2;
+  // ─────────── MIL-STD-2525E Symbol Specification ───────────
 
-  /// Type classification (aircraft, ground unit, etc.)
-  ObjectType object_type = 3;
+  /// Standard Identity (Friend/Hostile/Neutral/etc.)
+  StandardIdentity standard_identity = 2;
 
-  /// GPS Coordinates & Orientation.
-  float longitude = 4;
-  float latitude = 5;
+  /// Symbol Set (Air, Land, Sea, etc.)
+  SymbolSet symbol_set = 3;
 
-  /// Measured as MSL (Mean Sea Level) in feet
-  float altitude = 6;
+  /// Entity type specific to the symbol set
+  oneof entity {
+    AirEntity air_entity = 4;
+    LandEquipmentEntity land_equipment_entity = 5;
+    SeaEntity sea_entity = 6;
+  }
 
-  /// Measured in degrees (0-360)
-  float heading = 7;
+  /// Status (Operational condition)
+  ObjectStatus status = 7;
 
-  /// Velocity & Movement
+  /// Context (Reality/Exercise/Simulation)
+  Context context = 8;
+
+  /// Echelon/Mobility (for units)
+  optional Echelon echelon = 9;
+
+  /// Operational Condition Amplifier
+  optional OperationalCondition operational_condition = 10;
+
+  // ─────────── Position & Kinematics ───────────
+
+  /// GPS Coordinates
+  float longitude = 20;
+  float latitude = 21;
+
+  /// Altitude MSL (Mean Sea Level) in feet
+  float altitude = 22;
+
+  /// Heading in degrees (0-360)
+  float heading = 23;
+
   /// Speed in knots
-  optional float speed = 8;
+  optional float speed = 24;
 
   /// Vertical speed (climb/descent rate) in feet per minute
-  optional float vertical_speed = 9;
+  optional float vertical_speed = 25;
 
-  /// Operational Data
-  /// Current operational status
-  ObjectStatus status = 10;
+  // ─────────── Operational Data ───────────
 
   /// Fuel remaining as percentage (0-100)
-  optional float fuel_percentage = 11;
+  optional float fuel_percentage = 30;
 
   /// Ammunition/weapons remaining as percentage (0-100)
-  optional float ammo_percentage = 12;
+  optional float ammo_percentage = 31;
 
-  /// Identification & Metadata
-  /// Human-readable name/callsign (e.g., "Eagle-1", "Tank-Alpha-3")
-  optional string callsign = 13;
+  /// Battery/Power remaining (for UAVs) as percentage (0-100)
+  optional float battery_percentage = 32;
 
-  /// Model/class identifier (e.g., "F-16C", "M1A2 Abrams", "AH-64 Apache")
-  optional string model = 14;
+  // ─────────── Identification & Metadata ───────────
 
-  /// Unit or squadron this object belongs to
-  optional string unit = 15;
+  /// Human-readable callsign (e.g., "EAGLE-1", "REAPER-3", "ALPHA-ACTUAL")
+  optional string callsign = 40;
 
-  /// Timestamps
-  /// When this object was created/spawned in the simulation (Unix timestamp)
-  int64 created_at = 16;
+  /// Platform model/type (e.g., "MQ-9 Reaper", "F-16C", "M1A2 Abrams")
+  optional string model = 41;
 
-  /// Last time this object's data was updated (Unix timestamp)
-  int64 updated_at = 17;
+  /// Unit designation (e.g., "432d Wing", "1st Battalion", "CVN-68")
+  optional string unit = 42;
 
-  /// Mission & Task Data
+  /// Higher headquarters or controlling unit
+  optional string higher_formation = 43;
+
+  /// Unique name/designation
+  optional string unique_designation = 44;
+
+  /// Additional text modifiers for display
+  optional string additional_information = 45;
+
+  // ─────────── Timestamps ───────────
+
+  /// When this object was created/spawned (Unix timestamp)
+  int64 created_at = 50;
+
+  /// Last update timestamp (Unix timestamp)
+  int64 updated_at = 51;
+
+  // ─────────── Mission & Tasking ───────────
+
   /// Current task ID if assigned
-  optional bytes current_task_id = 18;
+  optional bytes current_task_id = 60;
 
-  /// Home base or spawn location
-  optional Location home_base = 19;
+  /// Home base or operating location
+  optional Location home_base = 61;
+
+  /// Direction of movement (for movement indicators)
+  optional float direction_of_movement = 62;
+
+  /// Speed leader line length (for display)
+  optional float speed_leader_scale = 63;
+
+  // ─────────── Combat Status ───────────
+
+  /// Is currently engaged in combat
+  bool is_engaged = 70;
+
+  /// Target object ID if engaging
+  optional bytes target_object_id = 71;
+
+  /// Threat level (1-5, where 5 is highest threat)
+  optional int32 threat_level = 72;
 }
 
-/// Represents a geographic location.
+/// Represents a geographic location
 message Location {
   float longitude = 1;
   float latitude = 2;
   optional float altitude = 3;
-  optional string name = 4; // e.g., "Nellis AFB", "Forward Operating Base Alpha"
+  optional string name = 4; // e.g., "KLAS", "Creech AFB", "FOB Alpha"
+  optional string mgrs = 5; // Military Grid Reference System coordinate
 }
 
-/// Represents a task or mission assigned to an Object.
+/// Represents a task or mission assigned to an Object
 message Task {
-  /// Unique task identifier (16-byte binary ULID).
+  /// Unique task identifier (16-byte binary ULID)
   bytes task_id = 1;
 
-  /// The ID of the object performing the task.
+  /// The ID of the object performing the task
   bytes assigned_object_id = 2;
 
-  /// Optional target for the task.
+  /// Optional target for the task
   optional bytes target_object_id = 3;
 
-  /// Task type/description
-  optional string task_type = 4; // e.g., "CAP", "CAS", "Strike", "Transport"
+  /// Task type (e.g., "CAP", "CAS", "ISR", "Strike", "Escort", "Intercept")
+  optional string task_type = 4;
 
   /// Task priority (1-10, higher is more important)
   optional int32 priority = 5;
 
+  /// Target area or waypoint
+  optional Location target_location = 6;
+
   /// Timestamps
-  int64 created_at = 6;
-  optional int64 started_at = 7;
-  optional int64 completed_at = 8;
+  int64 created_at = 10;
+  optional int64 started_at = 11;
+  optional int64 completed_at = 12;
+
+  /// Estimated time to complete (seconds)
+  optional int64 estimated_duration = 13;
+
+  /// Task status
+  optional string status = 14; // "ASSIGNED", "IN_PROGRESS", "COMPLETED", "ABORTED"
 }
 
 message ObjectList {

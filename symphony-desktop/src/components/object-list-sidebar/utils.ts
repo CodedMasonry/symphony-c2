@@ -1,32 +1,3 @@
-import { ObjectDesignation } from "@/generated/base";
-import { DESIGNATION_CONFIG } from "./constants";
-
-type DesignationConfigKey = keyof typeof DESIGNATION_CONFIG;
-
-export function getDesignationVariant(
-  designation: ObjectDesignation,
-): "default" | "destructive" | "outline" | "secondary" {
-  const config = DESIGNATION_CONFIG[designation as DesignationConfigKey];
-  return config?.variant ?? "outline";
-}
-
-export function getDesignationColor(designation: ObjectDesignation): string {
-  const config = DESIGNATION_CONFIG[designation as DesignationConfigKey];
-  return config?.color ?? "";
-}
-
-export function getDesignationBadge(designation: ObjectDesignation): string {
-  const config = DESIGNATION_CONFIG[designation as DesignationConfigKey];
-  return config?.badge ?? "UNK";
-}
-
-export function getDesignationIndicatorColor(
-  designation: ObjectDesignation,
-): string {
-  const config = DESIGNATION_CONFIG[designation as DesignationConfigKey];
-  return config?.indicatorColor ?? "text-muted-foreground";
-}
-
 export function formatTimestamp(timestamp: number): string {
   const now = Date.now();
   const diff = now - timestamp * 1000; // Convert Unix timestamp to milliseconds

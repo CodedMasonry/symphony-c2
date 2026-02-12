@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { fetchObjects, ObjectWithUlid } from "@/lib/proto_api";
-import { ObjectDesignation } from "@/generated/base";
+import { SymbolSet, StandardIdentity } from "@/generated/base";
 
 interface ObjectsStore {
   // State
@@ -19,29 +19,38 @@ interface ObjectsStore {
   loadObjects: () => Promise<void>;
   clearError: () => void;
 
-  // Selectors (optional helpers)
+  // Selectors
   getObjectByUlid: (ulid: string) => ObjectWithUlid | undefined;
-  getObjectsByDesignation: (designation: ObjectDesignation) => ObjectWithUlid[];
-  getObjectsByDesignationList: (
-    designation: ObjectDesignation[],
+
+  getObjectsBySymbolSet: (symbolSet: SymbolSet) => ObjectWithUlid[];
+  getObjectsBySymbolSetList: (symbolSets: SymbolSet[]) => ObjectWithUlid[];
+
+  getObjectsByIdentity: (identity: StandardIdentity) => ObjectWithUlid[];
+  getObjectsByIdentityList: (
+    identities: StandardIdentity[],
   ) => ObjectWithUlid[];
 }
 
 export const useObjectsStore = create<ObjectsStore>()(
   devtools(
     (set, get) => ({
+      // ─────────────────────────
       // Initial state
+      // ─────────────────────────
       objects: [],
       objectsById: new Map(),
       loading: false,
       error: null,
       lastFetch: null,
 
-      // Set all objects (replaces existing)
+      // ─────────────────────────
+      // Set all objects
+      // ─────────────────────────
       setObjects: (objects) => {
         const objectsById = new Map(
           objects.map((obj) => [obj.ulidString, obj]),
         );
+
         set({
           objects,
           objectsById,
@@ -50,10 +59,11 @@ export const useObjectsStore = create<ObjectsStore>()(
         });
       },
 
-      // Add a single object
+      // ─────────────────────────
+      // Add object
+      // ─────────────────────────
       addObject: (object) => {
         set((state) => {
-          // Check if object already exists
           if (state.objectsById.has(object.ulidString)) {
             console.warn(`Object ${object.ulidString} already exists`);
             return state;
@@ -69,7 +79,9 @@ export const useObjectsStore = create<ObjectsStore>()(
         });
       },
 
-      // Update existing object
+      // ─────────────────────────
+      // Update object
+      // ─────────────────────────
       updateObject: (object) => {
         set((state) => {
           if (!state.objectsById.has(object.ulidString)) {
@@ -89,7 +101,9 @@ export const useObjectsStore = create<ObjectsStore>()(
         });
       },
 
-      // Remove object by ULID
+      // ─────────────────────────
+      // Remove object
+      // ─────────────────────────
       removeObject: (ulid) => {
         set((state) => {
           const newObjectsById = new Map(state.objectsById);
@@ -102,44 +116,62 @@ export const useObjectsStore = create<ObjectsStore>()(
         });
       },
 
-      // Load objects from API
+      // ─────────────────────────
+      // Load from API
+      // ─────────────────────────
       loadObjects: async () => {
         set({ loading: true, error: null });
+
         try {
           const data = await fetchObjects();
           get().setObjects(data);
         } catch (err) {
           const errorMessage =
             err instanceof Error ? err.message : "Unknown error";
+
           console.error("Failed to load objects:", err);
+
           set({
             error: errorMessage,
             loading: false,
           });
-          throw err; // Re-throw so components can handle if needed
+
+          throw err;
         }
       },
 
-      // Clear error state
+      // ─────────────────────────
+      // Clear error
+      // ─────────────────────────
       clearError: () => set({ error: null }),
 
-      // Helper: Get single object by ULID
+      // ─────────────────────────
+      // Selectors
+      // ─────────────────────────
       getObjectByUlid: (ulid: string) => {
         return get().objectsById.get(ulid);
       },
 
-      // Helper: Filter objects by designation
-      getObjectsByDesignation: (designation: ObjectDesignation) => {
-        return get().objects.filter((obj) => obj.designation === designation);
+      getObjectsBySymbolSet: (symbolSet: SymbolSet) => {
+        return get().objects.filter((obj) => obj.symbolSet === symbolSet);
       },
 
-      // Helper: Filter objects by array of designation
-      getObjectsByDesignationList: (designationList: ObjectDesignation[]) => {
+      getObjectsBySymbolSetList: (symbolSets: SymbolSet[]) => {
         return get().objects.filter((obj) =>
-          designationList.includes(obj.designation),
+          symbolSets.includes(obj.symbolSet),
+        );
+      },
+
+      getObjectsByIdentity: (identity: StandardIdentity) => {
+        return get().objects.filter((obj) => obj.standardIdentity === identity);
+      },
+
+      getObjectsByIdentityList: (identities: StandardIdentity[]) => {
+        return get().objects.filter((obj) =>
+          identities.includes(obj.standardIdentity),
         );
       },
     }),
-    { name: "objects-store" }, // For Redux DevTools
+    { name: "objects-store" },
   ),
 );

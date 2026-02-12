@@ -9,157 +9,417 @@ import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 
 export const protobufPackage = "base";
 
-/** / Designation/alliance of an object in the simulation. */
-export enum ObjectDesignation {
-  OBJECT_DESIGNATION_UNSPECIFIED = 0,
-  OBJECT_DESIGNATION_HOSTILE = 1,
-  OBJECT_DESIGNATION_CIVILIAN = 2,
-  OBJECT_DESIGNATION_ALLY = 3,
-  OBJECT_DESIGNATION_FRIENDLY = 4,
+/** / Standard Identity (Affiliation) aligned with MIL-STD-2525E */
+export enum StandardIdentity {
+  STANDARD_IDENTITY_UNSPECIFIED = 0,
+  /** STANDARD_IDENTITY_PENDING - Yellow - Pending/Unknown */
+  STANDARD_IDENTITY_PENDING = 1,
+  /** STANDARD_IDENTITY_ASSUMED_FRIEND - Light Blue */
+  STANDARD_IDENTITY_ASSUMED_FRIEND = 2,
+  /** STANDARD_IDENTITY_FRIEND - Blue - Friendly forces */
+  STANDARD_IDENTITY_FRIEND = 3,
+  /** STANDARD_IDENTITY_NEUTRAL - Green - Neutral/Civilian */
+  STANDARD_IDENTITY_NEUTRAL = 4,
+  /** STANDARD_IDENTITY_SUSPECT - Red outline - Suspect */
+  STANDARD_IDENTITY_SUSPECT = 5,
+  /** STANDARD_IDENTITY_HOSTILE - Red - Hostile/Enemy forces */
+  STANDARD_IDENTITY_HOSTILE = 6,
   UNRECOGNIZED = -1,
 }
 
-export function objectDesignationFromJSON(object: any): ObjectDesignation {
+export function standardIdentityFromJSON(object: any): StandardIdentity {
   switch (object) {
     case 0:
-    case "OBJECT_DESIGNATION_UNSPECIFIED":
-      return ObjectDesignation.OBJECT_DESIGNATION_UNSPECIFIED;
+    case "STANDARD_IDENTITY_UNSPECIFIED":
+      return StandardIdentity.STANDARD_IDENTITY_UNSPECIFIED;
     case 1:
-    case "OBJECT_DESIGNATION_HOSTILE":
-      return ObjectDesignation.OBJECT_DESIGNATION_HOSTILE;
+    case "STANDARD_IDENTITY_PENDING":
+      return StandardIdentity.STANDARD_IDENTITY_PENDING;
     case 2:
-    case "OBJECT_DESIGNATION_CIVILIAN":
-      return ObjectDesignation.OBJECT_DESIGNATION_CIVILIAN;
+    case "STANDARD_IDENTITY_ASSUMED_FRIEND":
+      return StandardIdentity.STANDARD_IDENTITY_ASSUMED_FRIEND;
     case 3:
-    case "OBJECT_DESIGNATION_ALLY":
-      return ObjectDesignation.OBJECT_DESIGNATION_ALLY;
+    case "STANDARD_IDENTITY_FRIEND":
+      return StandardIdentity.STANDARD_IDENTITY_FRIEND;
     case 4:
-    case "OBJECT_DESIGNATION_FRIENDLY":
-      return ObjectDesignation.OBJECT_DESIGNATION_FRIENDLY;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return ObjectDesignation.UNRECOGNIZED;
-  }
-}
-
-export function objectDesignationToJSON(object: ObjectDesignation): string {
-  switch (object) {
-    case ObjectDesignation.OBJECT_DESIGNATION_UNSPECIFIED:
-      return "OBJECT_DESIGNATION_UNSPECIFIED";
-    case ObjectDesignation.OBJECT_DESIGNATION_HOSTILE:
-      return "OBJECT_DESIGNATION_HOSTILE";
-    case ObjectDesignation.OBJECT_DESIGNATION_CIVILIAN:
-      return "OBJECT_DESIGNATION_CIVILIAN";
-    case ObjectDesignation.OBJECT_DESIGNATION_ALLY:
-      return "OBJECT_DESIGNATION_ALLY";
-    case ObjectDesignation.OBJECT_DESIGNATION_FRIENDLY:
-      return "OBJECT_DESIGNATION_FRIENDLY";
-    case ObjectDesignation.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
-
-/** / Type classification for objects in the simulation. */
-export enum ObjectType {
-  OBJECT_TYPE_UNSPECIFIED = 0,
-  /** OBJECT_TYPE_FIXED_WING - Fighter jets, bombers, transport aircraft */
-  OBJECT_TYPE_FIXED_WING = 1,
-  /** OBJECT_TYPE_ROTARY_WING - Helicopters */
-  OBJECT_TYPE_ROTARY_WING = 2,
-  /** OBJECT_TYPE_GROUND_VEHICLE - Tanks, APCs, trucks */
-  OBJECT_TYPE_GROUND_VEHICLE = 3,
-  /** OBJECT_TYPE_NAVAL - Ships, boats */
-  OBJECT_TYPE_NAVAL = 4,
-  /** OBJECT_TYPE_INFANTRY - Ground troops */
-  OBJECT_TYPE_INFANTRY = 5,
-  /** OBJECT_TYPE_UAV - Unmanned aerial vehicles */
-  OBJECT_TYPE_UAV = 6,
-  /** OBJECT_TYPE_MISSILE - Missiles, rockets */
-  OBJECT_TYPE_MISSILE = 7,
-  /** OBJECT_TYPE_STRUCTURE - Buildings, installations */
-  OBJECT_TYPE_STRUCTURE = 8,
-  UNRECOGNIZED = -1,
-}
-
-export function objectTypeFromJSON(object: any): ObjectType {
-  switch (object) {
-    case 0:
-    case "OBJECT_TYPE_UNSPECIFIED":
-      return ObjectType.OBJECT_TYPE_UNSPECIFIED;
-    case 1:
-    case "OBJECT_TYPE_FIXED_WING":
-      return ObjectType.OBJECT_TYPE_FIXED_WING;
-    case 2:
-    case "OBJECT_TYPE_ROTARY_WING":
-      return ObjectType.OBJECT_TYPE_ROTARY_WING;
-    case 3:
-    case "OBJECT_TYPE_GROUND_VEHICLE":
-      return ObjectType.OBJECT_TYPE_GROUND_VEHICLE;
-    case 4:
-    case "OBJECT_TYPE_NAVAL":
-      return ObjectType.OBJECT_TYPE_NAVAL;
+    case "STANDARD_IDENTITY_NEUTRAL":
+      return StandardIdentity.STANDARD_IDENTITY_NEUTRAL;
     case 5:
-    case "OBJECT_TYPE_INFANTRY":
-      return ObjectType.OBJECT_TYPE_INFANTRY;
+    case "STANDARD_IDENTITY_SUSPECT":
+      return StandardIdentity.STANDARD_IDENTITY_SUSPECT;
     case 6:
-    case "OBJECT_TYPE_UAV":
-      return ObjectType.OBJECT_TYPE_UAV;
-    case 7:
-    case "OBJECT_TYPE_MISSILE":
-      return ObjectType.OBJECT_TYPE_MISSILE;
-    case 8:
-    case "OBJECT_TYPE_STRUCTURE":
-      return ObjectType.OBJECT_TYPE_STRUCTURE;
+    case "STANDARD_IDENTITY_HOSTILE":
+      return StandardIdentity.STANDARD_IDENTITY_HOSTILE;
     case -1:
     case "UNRECOGNIZED":
     default:
-      return ObjectType.UNRECOGNIZED;
+      return StandardIdentity.UNRECOGNIZED;
   }
 }
 
-export function objectTypeToJSON(object: ObjectType): string {
+export function standardIdentityToJSON(object: StandardIdentity): string {
   switch (object) {
-    case ObjectType.OBJECT_TYPE_UNSPECIFIED:
-      return "OBJECT_TYPE_UNSPECIFIED";
-    case ObjectType.OBJECT_TYPE_FIXED_WING:
-      return "OBJECT_TYPE_FIXED_WING";
-    case ObjectType.OBJECT_TYPE_ROTARY_WING:
-      return "OBJECT_TYPE_ROTARY_WING";
-    case ObjectType.OBJECT_TYPE_GROUND_VEHICLE:
-      return "OBJECT_TYPE_GROUND_VEHICLE";
-    case ObjectType.OBJECT_TYPE_NAVAL:
-      return "OBJECT_TYPE_NAVAL";
-    case ObjectType.OBJECT_TYPE_INFANTRY:
-      return "OBJECT_TYPE_INFANTRY";
-    case ObjectType.OBJECT_TYPE_UAV:
-      return "OBJECT_TYPE_UAV";
-    case ObjectType.OBJECT_TYPE_MISSILE:
-      return "OBJECT_TYPE_MISSILE";
-    case ObjectType.OBJECT_TYPE_STRUCTURE:
-      return "OBJECT_TYPE_STRUCTURE";
-    case ObjectType.UNRECOGNIZED:
+    case StandardIdentity.STANDARD_IDENTITY_UNSPECIFIED:
+      return "STANDARD_IDENTITY_UNSPECIFIED";
+    case StandardIdentity.STANDARD_IDENTITY_PENDING:
+      return "STANDARD_IDENTITY_PENDING";
+    case StandardIdentity.STANDARD_IDENTITY_ASSUMED_FRIEND:
+      return "STANDARD_IDENTITY_ASSUMED_FRIEND";
+    case StandardIdentity.STANDARD_IDENTITY_FRIEND:
+      return "STANDARD_IDENTITY_FRIEND";
+    case StandardIdentity.STANDARD_IDENTITY_NEUTRAL:
+      return "STANDARD_IDENTITY_NEUTRAL";
+    case StandardIdentity.STANDARD_IDENTITY_SUSPECT:
+      return "STANDARD_IDENTITY_SUSPECT";
+    case StandardIdentity.STANDARD_IDENTITY_HOSTILE:
+      return "STANDARD_IDENTITY_HOSTILE";
+    case StandardIdentity.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
   }
 }
 
-/** / Operational status of an object. */
+/** / Symbol Set aligned with MIL-STD-2525E Appendix A */
+export enum SymbolSet {
+  SYMBOL_SET_UNSPECIFIED = 0,
+  /** SYMBOL_SET_AIR - Code 01 - Aircraft */
+  SYMBOL_SET_AIR = 1,
+  /** SYMBOL_SET_AIR_MISSILE - Code 02 - Air Missiles */
+  SYMBOL_SET_AIR_MISSILE = 2,
+  /** SYMBOL_SET_SPACE - Code 05 - Space */
+  SYMBOL_SET_SPACE = 5,
+  /** SYMBOL_SET_LAND_UNIT - Code 10 - Land Units */
+  SYMBOL_SET_LAND_UNIT = 10,
+  /** SYMBOL_SET_LAND_CIVILIAN - Code 11 - Land Civilian */
+  SYMBOL_SET_LAND_CIVILIAN = 11,
+  /** SYMBOL_SET_LAND_EQUIPMENT - Code 15 - Land Equipment */
+  SYMBOL_SET_LAND_EQUIPMENT = 15,
+  /** SYMBOL_SET_SEA_SURFACE - Code 30 - Sea Surface */
+  SYMBOL_SET_SEA_SURFACE = 30,
+  /** SYMBOL_SET_SEA_SUBSURFACE - Code 35 - Sea Subsurface */
+  SYMBOL_SET_SEA_SUBSURFACE = 35,
+  /** SYMBOL_SET_ACTIVITIES - Code 40 - Activities */
+  SYMBOL_SET_ACTIVITIES = 40,
+  /** SYMBOL_SET_INSTALLATIONS - Code 45 - Installations */
+  SYMBOL_SET_INSTALLATIONS = 45,
+  UNRECOGNIZED = -1,
+}
+
+export function symbolSetFromJSON(object: any): SymbolSet {
+  switch (object) {
+    case 0:
+    case "SYMBOL_SET_UNSPECIFIED":
+      return SymbolSet.SYMBOL_SET_UNSPECIFIED;
+    case 1:
+    case "SYMBOL_SET_AIR":
+      return SymbolSet.SYMBOL_SET_AIR;
+    case 2:
+    case "SYMBOL_SET_AIR_MISSILE":
+      return SymbolSet.SYMBOL_SET_AIR_MISSILE;
+    case 5:
+    case "SYMBOL_SET_SPACE":
+      return SymbolSet.SYMBOL_SET_SPACE;
+    case 10:
+    case "SYMBOL_SET_LAND_UNIT":
+      return SymbolSet.SYMBOL_SET_LAND_UNIT;
+    case 11:
+    case "SYMBOL_SET_LAND_CIVILIAN":
+      return SymbolSet.SYMBOL_SET_LAND_CIVILIAN;
+    case 15:
+    case "SYMBOL_SET_LAND_EQUIPMENT":
+      return SymbolSet.SYMBOL_SET_LAND_EQUIPMENT;
+    case 30:
+    case "SYMBOL_SET_SEA_SURFACE":
+      return SymbolSet.SYMBOL_SET_SEA_SURFACE;
+    case 35:
+    case "SYMBOL_SET_SEA_SUBSURFACE":
+      return SymbolSet.SYMBOL_SET_SEA_SUBSURFACE;
+    case 40:
+    case "SYMBOL_SET_ACTIVITIES":
+      return SymbolSet.SYMBOL_SET_ACTIVITIES;
+    case 45:
+    case "SYMBOL_SET_INSTALLATIONS":
+      return SymbolSet.SYMBOL_SET_INSTALLATIONS;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return SymbolSet.UNRECOGNIZED;
+  }
+}
+
+export function symbolSetToJSON(object: SymbolSet): string {
+  switch (object) {
+    case SymbolSet.SYMBOL_SET_UNSPECIFIED:
+      return "SYMBOL_SET_UNSPECIFIED";
+    case SymbolSet.SYMBOL_SET_AIR:
+      return "SYMBOL_SET_AIR";
+    case SymbolSet.SYMBOL_SET_AIR_MISSILE:
+      return "SYMBOL_SET_AIR_MISSILE";
+    case SymbolSet.SYMBOL_SET_SPACE:
+      return "SYMBOL_SET_SPACE";
+    case SymbolSet.SYMBOL_SET_LAND_UNIT:
+      return "SYMBOL_SET_LAND_UNIT";
+    case SymbolSet.SYMBOL_SET_LAND_CIVILIAN:
+      return "SYMBOL_SET_LAND_CIVILIAN";
+    case SymbolSet.SYMBOL_SET_LAND_EQUIPMENT:
+      return "SYMBOL_SET_LAND_EQUIPMENT";
+    case SymbolSet.SYMBOL_SET_SEA_SURFACE:
+      return "SYMBOL_SET_SEA_SURFACE";
+    case SymbolSet.SYMBOL_SET_SEA_SUBSURFACE:
+      return "SYMBOL_SET_SEA_SUBSURFACE";
+    case SymbolSet.SYMBOL_SET_ACTIVITIES:
+      return "SYMBOL_SET_ACTIVITIES";
+    case SymbolSet.SYMBOL_SET_INSTALLATIONS:
+      return "SYMBOL_SET_INSTALLATIONS";
+    case SymbolSet.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+/** / Entity types for Air symbol set (MIL-STD-2525E) */
+export enum AirEntity {
+  AIR_ENTITY_UNSPECIFIED = 0,
+  /** AIR_ENTITY_MILITARY_AIRCRAFT - 11 - Fixed wing */
+  AIR_ENTITY_MILITARY_AIRCRAFT = 1,
+  /** AIR_ENTITY_CIVILIAN_AIRCRAFT - 12 */
+  AIR_ENTITY_CIVILIAN_AIRCRAFT = 2,
+  /** AIR_ENTITY_MILITARY_HELICOPTER - 15 - Rotary wing */
+  AIR_ENTITY_MILITARY_HELICOPTER = 3,
+  /** AIR_ENTITY_CIVILIAN_HELICOPTER - 16 */
+  AIR_ENTITY_CIVILIAN_HELICOPTER = 4,
+  /** AIR_ENTITY_UAV_FIXED_WING - 21 - UAS/Drone fixed wing */
+  AIR_ENTITY_UAV_FIXED_WING = 5,
+  /** AIR_ENTITY_UAV_ROTARY_WING - 22 - UAS/Drone rotary wing */
+  AIR_ENTITY_UAV_ROTARY_WING = 6,
+  /** AIR_ENTITY_MISSILE - 41 - Missile */
+  AIR_ENTITY_MISSILE = 7,
+  /** AIR_ENTITY_MISSILE_DECOY - 42 */
+  AIR_ENTITY_MISSILE_DECOY = 8,
+  UNRECOGNIZED = -1,
+}
+
+export function airEntityFromJSON(object: any): AirEntity {
+  switch (object) {
+    case 0:
+    case "AIR_ENTITY_UNSPECIFIED":
+      return AirEntity.AIR_ENTITY_UNSPECIFIED;
+    case 1:
+    case "AIR_ENTITY_MILITARY_AIRCRAFT":
+      return AirEntity.AIR_ENTITY_MILITARY_AIRCRAFT;
+    case 2:
+    case "AIR_ENTITY_CIVILIAN_AIRCRAFT":
+      return AirEntity.AIR_ENTITY_CIVILIAN_AIRCRAFT;
+    case 3:
+    case "AIR_ENTITY_MILITARY_HELICOPTER":
+      return AirEntity.AIR_ENTITY_MILITARY_HELICOPTER;
+    case 4:
+    case "AIR_ENTITY_CIVILIAN_HELICOPTER":
+      return AirEntity.AIR_ENTITY_CIVILIAN_HELICOPTER;
+    case 5:
+    case "AIR_ENTITY_UAV_FIXED_WING":
+      return AirEntity.AIR_ENTITY_UAV_FIXED_WING;
+    case 6:
+    case "AIR_ENTITY_UAV_ROTARY_WING":
+      return AirEntity.AIR_ENTITY_UAV_ROTARY_WING;
+    case 7:
+    case "AIR_ENTITY_MISSILE":
+      return AirEntity.AIR_ENTITY_MISSILE;
+    case 8:
+    case "AIR_ENTITY_MISSILE_DECOY":
+      return AirEntity.AIR_ENTITY_MISSILE_DECOY;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return AirEntity.UNRECOGNIZED;
+  }
+}
+
+export function airEntityToJSON(object: AirEntity): string {
+  switch (object) {
+    case AirEntity.AIR_ENTITY_UNSPECIFIED:
+      return "AIR_ENTITY_UNSPECIFIED";
+    case AirEntity.AIR_ENTITY_MILITARY_AIRCRAFT:
+      return "AIR_ENTITY_MILITARY_AIRCRAFT";
+    case AirEntity.AIR_ENTITY_CIVILIAN_AIRCRAFT:
+      return "AIR_ENTITY_CIVILIAN_AIRCRAFT";
+    case AirEntity.AIR_ENTITY_MILITARY_HELICOPTER:
+      return "AIR_ENTITY_MILITARY_HELICOPTER";
+    case AirEntity.AIR_ENTITY_CIVILIAN_HELICOPTER:
+      return "AIR_ENTITY_CIVILIAN_HELICOPTER";
+    case AirEntity.AIR_ENTITY_UAV_FIXED_WING:
+      return "AIR_ENTITY_UAV_FIXED_WING";
+    case AirEntity.AIR_ENTITY_UAV_ROTARY_WING:
+      return "AIR_ENTITY_UAV_ROTARY_WING";
+    case AirEntity.AIR_ENTITY_MISSILE:
+      return "AIR_ENTITY_MISSILE";
+    case AirEntity.AIR_ENTITY_MISSILE_DECOY:
+      return "AIR_ENTITY_MISSILE_DECOY";
+    case AirEntity.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+/** / Entity types for Land Equipment */
+export enum LandEquipmentEntity {
+  LAND_EQUIPMENT_ENTITY_UNSPECIFIED = 0,
+  /** LAND_EQUIPMENT_ENTITY_ARMORED_VEHICLE - 12 - Armored fighting vehicle */
+  LAND_EQUIPMENT_ENTITY_ARMORED_VEHICLE = 1,
+  /** LAND_EQUIPMENT_ENTITY_TANK - 13 - Tank */
+  LAND_EQUIPMENT_ENTITY_TANK = 2,
+  /** LAND_EQUIPMENT_ENTITY_APC - 14 - Armored personnel carrier */
+  LAND_EQUIPMENT_ENTITY_APC = 3,
+  /** LAND_EQUIPMENT_ENTITY_TRUCK - 31 - Truck */
+  LAND_EQUIPMENT_ENTITY_TRUCK = 4,
+  /** LAND_EQUIPMENT_ENTITY_GROUND_STATION - Ground control station */
+  LAND_EQUIPMENT_ENTITY_GROUND_STATION = 5,
+  /** LAND_EQUIPMENT_ENTITY_LAUNCHER - 41 - Missile launcher */
+  LAND_EQUIPMENT_ENTITY_LAUNCHER = 6,
+  UNRECOGNIZED = -1,
+}
+
+export function landEquipmentEntityFromJSON(object: any): LandEquipmentEntity {
+  switch (object) {
+    case 0:
+    case "LAND_EQUIPMENT_ENTITY_UNSPECIFIED":
+      return LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_UNSPECIFIED;
+    case 1:
+    case "LAND_EQUIPMENT_ENTITY_ARMORED_VEHICLE":
+      return LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_ARMORED_VEHICLE;
+    case 2:
+    case "LAND_EQUIPMENT_ENTITY_TANK":
+      return LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_TANK;
+    case 3:
+    case "LAND_EQUIPMENT_ENTITY_APC":
+      return LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_APC;
+    case 4:
+    case "LAND_EQUIPMENT_ENTITY_TRUCK":
+      return LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_TRUCK;
+    case 5:
+    case "LAND_EQUIPMENT_ENTITY_GROUND_STATION":
+      return LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_GROUND_STATION;
+    case 6:
+    case "LAND_EQUIPMENT_ENTITY_LAUNCHER":
+      return LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_LAUNCHER;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return LandEquipmentEntity.UNRECOGNIZED;
+  }
+}
+
+export function landEquipmentEntityToJSON(object: LandEquipmentEntity): string {
+  switch (object) {
+    case LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_UNSPECIFIED:
+      return "LAND_EQUIPMENT_ENTITY_UNSPECIFIED";
+    case LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_ARMORED_VEHICLE:
+      return "LAND_EQUIPMENT_ENTITY_ARMORED_VEHICLE";
+    case LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_TANK:
+      return "LAND_EQUIPMENT_ENTITY_TANK";
+    case LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_APC:
+      return "LAND_EQUIPMENT_ENTITY_APC";
+    case LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_TRUCK:
+      return "LAND_EQUIPMENT_ENTITY_TRUCK";
+    case LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_GROUND_STATION:
+      return "LAND_EQUIPMENT_ENTITY_GROUND_STATION";
+    case LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_LAUNCHER:
+      return "LAND_EQUIPMENT_ENTITY_LAUNCHER";
+    case LandEquipmentEntity.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+/** / Entity types for Sea Surface */
+export enum SeaEntity {
+  SEA_ENTITY_UNSPECIFIED = 0,
+  /** SEA_ENTITY_COMBATANT - 11 - Combatant */
+  SEA_ENTITY_COMBATANT = 1,
+  /** SEA_ENTITY_CARRIER - 12 - Aircraft carrier */
+  SEA_ENTITY_CARRIER = 2,
+  /** SEA_ENTITY_CRUISER - 13 */
+  SEA_ENTITY_CRUISER = 3,
+  /** SEA_ENTITY_DESTROYER - 14 */
+  SEA_ENTITY_DESTROYER = 4,
+  /** SEA_ENTITY_FRIGATE - 15 */
+  SEA_ENTITY_FRIGATE = 5,
+  /** SEA_ENTITY_PATROL_CRAFT - 51 */
+  SEA_ENTITY_PATROL_CRAFT = 6,
+  /** SEA_ENTITY_USV - Unmanned surface vehicle */
+  SEA_ENTITY_USV = 7,
+  UNRECOGNIZED = -1,
+}
+
+export function seaEntityFromJSON(object: any): SeaEntity {
+  switch (object) {
+    case 0:
+    case "SEA_ENTITY_UNSPECIFIED":
+      return SeaEntity.SEA_ENTITY_UNSPECIFIED;
+    case 1:
+    case "SEA_ENTITY_COMBATANT":
+      return SeaEntity.SEA_ENTITY_COMBATANT;
+    case 2:
+    case "SEA_ENTITY_CARRIER":
+      return SeaEntity.SEA_ENTITY_CARRIER;
+    case 3:
+    case "SEA_ENTITY_CRUISER":
+      return SeaEntity.SEA_ENTITY_CRUISER;
+    case 4:
+    case "SEA_ENTITY_DESTROYER":
+      return SeaEntity.SEA_ENTITY_DESTROYER;
+    case 5:
+    case "SEA_ENTITY_FRIGATE":
+      return SeaEntity.SEA_ENTITY_FRIGATE;
+    case 6:
+    case "SEA_ENTITY_PATROL_CRAFT":
+      return SeaEntity.SEA_ENTITY_PATROL_CRAFT;
+    case 7:
+    case "SEA_ENTITY_USV":
+      return SeaEntity.SEA_ENTITY_USV;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return SeaEntity.UNRECOGNIZED;
+  }
+}
+
+export function seaEntityToJSON(object: SeaEntity): string {
+  switch (object) {
+    case SeaEntity.SEA_ENTITY_UNSPECIFIED:
+      return "SEA_ENTITY_UNSPECIFIED";
+    case SeaEntity.SEA_ENTITY_COMBATANT:
+      return "SEA_ENTITY_COMBATANT";
+    case SeaEntity.SEA_ENTITY_CARRIER:
+      return "SEA_ENTITY_CARRIER";
+    case SeaEntity.SEA_ENTITY_CRUISER:
+      return "SEA_ENTITY_CRUISER";
+    case SeaEntity.SEA_ENTITY_DESTROYER:
+      return "SEA_ENTITY_DESTROYER";
+    case SeaEntity.SEA_ENTITY_FRIGATE:
+      return "SEA_ENTITY_FRIGATE";
+    case SeaEntity.SEA_ENTITY_PATROL_CRAFT:
+      return "SEA_ENTITY_PATROL_CRAFT";
+    case SeaEntity.SEA_ENTITY_USV:
+      return "SEA_ENTITY_USV";
+    case SeaEntity.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+/** / Operational status of an object (MIL-STD-2525E Status codes) */
 export enum ObjectStatus {
   OBJECT_STATUS_UNSPECIFIED = 0,
-  /** OBJECT_STATUS_ACTIVE - Operational and mission-capable */
-  OBJECT_STATUS_ACTIVE = 1,
-  /** OBJECT_STATUS_DAMAGED - Partially functional */
-  OBJECT_STATUS_DAMAGED = 2,
-  /** OBJECT_STATUS_DESTROYED - Non-functional */
-  OBJECT_STATUS_DESTROYED = 3,
-  /** OBJECT_STATUS_RETURNING - Returning to base */
-  OBJECT_STATUS_RETURNING = 4,
-  /** OBJECT_STATUS_STANDBY - On standby/idle */
-  OBJECT_STATUS_STANDBY = 5,
-  /** OBJECT_STATUS_ENGAGED - Currently in combat */
-  OBJECT_STATUS_ENGAGED = 6,
+  /** OBJECT_STATUS_PRESENT - Present/Fully Capable */
+  OBJECT_STATUS_PRESENT = 1,
+  /** OBJECT_STATUS_PRESENT_DAMAGED - Present but damaged */
+  OBJECT_STATUS_PRESENT_DAMAGED = 2,
+  /** OBJECT_STATUS_PRESENT_DESTROYED - Present but destroyed */
+  OBJECT_STATUS_PRESENT_DESTROYED = 3,
+  OBJECT_STATUS_PRESENT_FULL_TO_CAPACITY = 4,
+  /** OBJECT_STATUS_ANTICIPATED - Planned/Anticipated */
+  OBJECT_STATUS_ANTICIPATED = 5,
   UNRECOGNIZED = -1,
 }
 
@@ -169,23 +429,20 @@ export function objectStatusFromJSON(object: any): ObjectStatus {
     case "OBJECT_STATUS_UNSPECIFIED":
       return ObjectStatus.OBJECT_STATUS_UNSPECIFIED;
     case 1:
-    case "OBJECT_STATUS_ACTIVE":
-      return ObjectStatus.OBJECT_STATUS_ACTIVE;
+    case "OBJECT_STATUS_PRESENT":
+      return ObjectStatus.OBJECT_STATUS_PRESENT;
     case 2:
-    case "OBJECT_STATUS_DAMAGED":
-      return ObjectStatus.OBJECT_STATUS_DAMAGED;
+    case "OBJECT_STATUS_PRESENT_DAMAGED":
+      return ObjectStatus.OBJECT_STATUS_PRESENT_DAMAGED;
     case 3:
-    case "OBJECT_STATUS_DESTROYED":
-      return ObjectStatus.OBJECT_STATUS_DESTROYED;
+    case "OBJECT_STATUS_PRESENT_DESTROYED":
+      return ObjectStatus.OBJECT_STATUS_PRESENT_DESTROYED;
     case 4:
-    case "OBJECT_STATUS_RETURNING":
-      return ObjectStatus.OBJECT_STATUS_RETURNING;
+    case "OBJECT_STATUS_PRESENT_FULL_TO_CAPACITY":
+      return ObjectStatus.OBJECT_STATUS_PRESENT_FULL_TO_CAPACITY;
     case 5:
-    case "OBJECT_STATUS_STANDBY":
-      return ObjectStatus.OBJECT_STATUS_STANDBY;
-    case 6:
-    case "OBJECT_STATUS_ENGAGED":
-      return ObjectStatus.OBJECT_STATUS_ENGAGED;
+    case "OBJECT_STATUS_ANTICIPATED":
+      return ObjectStatus.OBJECT_STATUS_ANTICIPATED;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -197,105 +454,383 @@ export function objectStatusToJSON(object: ObjectStatus): string {
   switch (object) {
     case ObjectStatus.OBJECT_STATUS_UNSPECIFIED:
       return "OBJECT_STATUS_UNSPECIFIED";
-    case ObjectStatus.OBJECT_STATUS_ACTIVE:
-      return "OBJECT_STATUS_ACTIVE";
-    case ObjectStatus.OBJECT_STATUS_DAMAGED:
-      return "OBJECT_STATUS_DAMAGED";
-    case ObjectStatus.OBJECT_STATUS_DESTROYED:
-      return "OBJECT_STATUS_DESTROYED";
-    case ObjectStatus.OBJECT_STATUS_RETURNING:
-      return "OBJECT_STATUS_RETURNING";
-    case ObjectStatus.OBJECT_STATUS_STANDBY:
-      return "OBJECT_STATUS_STANDBY";
-    case ObjectStatus.OBJECT_STATUS_ENGAGED:
-      return "OBJECT_STATUS_ENGAGED";
+    case ObjectStatus.OBJECT_STATUS_PRESENT:
+      return "OBJECT_STATUS_PRESENT";
+    case ObjectStatus.OBJECT_STATUS_PRESENT_DAMAGED:
+      return "OBJECT_STATUS_PRESENT_DAMAGED";
+    case ObjectStatus.OBJECT_STATUS_PRESENT_DESTROYED:
+      return "OBJECT_STATUS_PRESENT_DESTROYED";
+    case ObjectStatus.OBJECT_STATUS_PRESENT_FULL_TO_CAPACITY:
+      return "OBJECT_STATUS_PRESENT_FULL_TO_CAPACITY";
+    case ObjectStatus.OBJECT_STATUS_ANTICIPATED:
+      return "OBJECT_STATUS_ANTICIPATED";
     case ObjectStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
   }
 }
 
-/** / Base entity representing a trackable object (e.g., aircraft, unit). */
-export interface Object {
-  /** / Unique identifier (16-byte binary ULID). */
-  objectId: Uint8Array;
-  /** / The alliance/designation of the entity. */
-  designation: ObjectDesignation;
-  /** / Type classification (aircraft, ground unit, etc.) */
-  objectType: ObjectType;
-  /** / GPS Coordinates & Orientation. */
-  longitude: number;
-  latitude: number;
-  /** / Measured as MSL (Mean Sea Level) in feet */
-  altitude: number;
-  /** / Measured in degrees (0-360) */
-  heading: number;
-  /**
-   * / Velocity & Movement
-   * / Speed in knots
-   */
-  speed?: number | undefined;
-  /** / Vertical speed (climb/descent rate) in feet per minute */
-  verticalSpeed?: number | undefined;
-  /**
-   * / Operational Data
-   * / Current operational status
-   */
-  status: ObjectStatus;
-  /** / Fuel remaining as percentage (0-100) */
-  fuelPercentage?: number | undefined;
-  /** / Ammunition/weapons remaining as percentage (0-100) */
-  ammoPercentage?: number | undefined;
-  /**
-   * / Identification & Metadata
-   * / Human-readable name/callsign (e.g., "Eagle-1", "Tank-Alpha-3")
-   */
-  callsign?: string | undefined;
-  /** / Model/class identifier (e.g., "F-16C", "M1A2 Abrams", "AH-64 Apache") */
-  model?: string | undefined;
-  /** / Unit or squadron this object belongs to */
-  unit?: string | undefined;
-  /**
-   * / Timestamps
-   * / When this object was created/spawned in the simulation (Unix timestamp)
-   */
-  createdAt: number;
-  /** / Last time this object's data was updated (Unix timestamp) */
-  updatedAt: number;
-  /**
-   * / Mission & Task Data
-   * / Current task ID if assigned
-   */
-  currentTaskId?: Uint8Array | undefined;
-  /** / Home base or spawn location */
-  homeBase?: Location | undefined;
+/** / Context (Reality) - MIL-STD-2525E */
+export enum Context {
+  CONTEXT_UNSPECIFIED = 0,
+  /** CONTEXT_REALITY - Actual real-world entity */
+  CONTEXT_REALITY = 1,
+  /** CONTEXT_EXERCISE - Exercise/Simulation entity */
+  CONTEXT_EXERCISE = 2,
+  /** CONTEXT_SIMULATION - Pure simulation */
+  CONTEXT_SIMULATION = 3,
+  UNRECOGNIZED = -1,
 }
 
-/** / Represents a geographic location. */
+export function contextFromJSON(object: any): Context {
+  switch (object) {
+    case 0:
+    case "CONTEXT_UNSPECIFIED":
+      return Context.CONTEXT_UNSPECIFIED;
+    case 1:
+    case "CONTEXT_REALITY":
+      return Context.CONTEXT_REALITY;
+    case 2:
+    case "CONTEXT_EXERCISE":
+      return Context.CONTEXT_EXERCISE;
+    case 3:
+    case "CONTEXT_SIMULATION":
+      return Context.CONTEXT_SIMULATION;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return Context.UNRECOGNIZED;
+  }
+}
+
+export function contextToJSON(object: Context): string {
+  switch (object) {
+    case Context.CONTEXT_UNSPECIFIED:
+      return "CONTEXT_UNSPECIFIED";
+    case Context.CONTEXT_REALITY:
+      return "CONTEXT_REALITY";
+    case Context.CONTEXT_EXERCISE:
+      return "CONTEXT_EXERCISE";
+    case Context.CONTEXT_SIMULATION:
+      return "CONTEXT_SIMULATION";
+    case Context.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+/** / Operational Condition Amplifier */
+export enum OperationalCondition {
+  OPERATIONAL_CONDITION_UNSPECIFIED = 0,
+  OPERATIONAL_CONDITION_FULLY_CAPABLE = 1,
+  OPERATIONAL_CONDITION_DAMAGED = 2,
+  OPERATIONAL_CONDITION_DESTROYED = 3,
+  OPERATIONAL_CONDITION_FULL_TO_CAPACITY = 4,
+  UNRECOGNIZED = -1,
+}
+
+export function operationalConditionFromJSON(object: any): OperationalCondition {
+  switch (object) {
+    case 0:
+    case "OPERATIONAL_CONDITION_UNSPECIFIED":
+      return OperationalCondition.OPERATIONAL_CONDITION_UNSPECIFIED;
+    case 1:
+    case "OPERATIONAL_CONDITION_FULLY_CAPABLE":
+      return OperationalCondition.OPERATIONAL_CONDITION_FULLY_CAPABLE;
+    case 2:
+    case "OPERATIONAL_CONDITION_DAMAGED":
+      return OperationalCondition.OPERATIONAL_CONDITION_DAMAGED;
+    case 3:
+    case "OPERATIONAL_CONDITION_DESTROYED":
+      return OperationalCondition.OPERATIONAL_CONDITION_DESTROYED;
+    case 4:
+    case "OPERATIONAL_CONDITION_FULL_TO_CAPACITY":
+      return OperationalCondition.OPERATIONAL_CONDITION_FULL_TO_CAPACITY;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return OperationalCondition.UNRECOGNIZED;
+  }
+}
+
+export function operationalConditionToJSON(object: OperationalCondition): string {
+  switch (object) {
+    case OperationalCondition.OPERATIONAL_CONDITION_UNSPECIFIED:
+      return "OPERATIONAL_CONDITION_UNSPECIFIED";
+    case OperationalCondition.OPERATIONAL_CONDITION_FULLY_CAPABLE:
+      return "OPERATIONAL_CONDITION_FULLY_CAPABLE";
+    case OperationalCondition.OPERATIONAL_CONDITION_DAMAGED:
+      return "OPERATIONAL_CONDITION_DAMAGED";
+    case OperationalCondition.OPERATIONAL_CONDITION_DESTROYED:
+      return "OPERATIONAL_CONDITION_DESTROYED";
+    case OperationalCondition.OPERATIONAL_CONDITION_FULL_TO_CAPACITY:
+      return "OPERATIONAL_CONDITION_FULL_TO_CAPACITY";
+    case OperationalCondition.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+/** / Echelon/Mobility indicator for units */
+export enum Echelon {
+  ECHELON_UNSPECIFIED = 0,
+  /** ECHELON_TEAM_CREW - Team/Crew */
+  ECHELON_TEAM_CREW = 1,
+  /** ECHELON_SQUAD - Squad */
+  ECHELON_SQUAD = 2,
+  /** ECHELON_SECTION - Section */
+  ECHELON_SECTION = 3,
+  /** ECHELON_PLATOON_DETACHMENT - Platoon/Detachment */
+  ECHELON_PLATOON_DETACHMENT = 4,
+  /** ECHELON_COMPANY - Company/Battery/Troop */
+  ECHELON_COMPANY = 5,
+  /** ECHELON_BATTALION - Battalion/Squadron */
+  ECHELON_BATTALION = 6,
+  /** ECHELON_REGIMENT - Regiment/Group */
+  ECHELON_REGIMENT = 7,
+  /** ECHELON_BRIGADE - Brigade */
+  ECHELON_BRIGADE = 8,
+  /** ECHELON_DIVISION - Division */
+  ECHELON_DIVISION = 9,
+  /** ECHELON_CORPS - Corps */
+  ECHELON_CORPS = 10,
+  /** ECHELON_ARMY - Army */
+  ECHELON_ARMY = 11,
+  UNRECOGNIZED = -1,
+}
+
+export function echelonFromJSON(object: any): Echelon {
+  switch (object) {
+    case 0:
+    case "ECHELON_UNSPECIFIED":
+      return Echelon.ECHELON_UNSPECIFIED;
+    case 1:
+    case "ECHELON_TEAM_CREW":
+      return Echelon.ECHELON_TEAM_CREW;
+    case 2:
+    case "ECHELON_SQUAD":
+      return Echelon.ECHELON_SQUAD;
+    case 3:
+    case "ECHELON_SECTION":
+      return Echelon.ECHELON_SECTION;
+    case 4:
+    case "ECHELON_PLATOON_DETACHMENT":
+      return Echelon.ECHELON_PLATOON_DETACHMENT;
+    case 5:
+    case "ECHELON_COMPANY":
+      return Echelon.ECHELON_COMPANY;
+    case 6:
+    case "ECHELON_BATTALION":
+      return Echelon.ECHELON_BATTALION;
+    case 7:
+    case "ECHELON_REGIMENT":
+      return Echelon.ECHELON_REGIMENT;
+    case 8:
+    case "ECHELON_BRIGADE":
+      return Echelon.ECHELON_BRIGADE;
+    case 9:
+    case "ECHELON_DIVISION":
+      return Echelon.ECHELON_DIVISION;
+    case 10:
+    case "ECHELON_CORPS":
+      return Echelon.ECHELON_CORPS;
+    case 11:
+    case "ECHELON_ARMY":
+      return Echelon.ECHELON_ARMY;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return Echelon.UNRECOGNIZED;
+  }
+}
+
+export function echelonToJSON(object: Echelon): string {
+  switch (object) {
+    case Echelon.ECHELON_UNSPECIFIED:
+      return "ECHELON_UNSPECIFIED";
+    case Echelon.ECHELON_TEAM_CREW:
+      return "ECHELON_TEAM_CREW";
+    case Echelon.ECHELON_SQUAD:
+      return "ECHELON_SQUAD";
+    case Echelon.ECHELON_SECTION:
+      return "ECHELON_SECTION";
+    case Echelon.ECHELON_PLATOON_DETACHMENT:
+      return "ECHELON_PLATOON_DETACHMENT";
+    case Echelon.ECHELON_COMPANY:
+      return "ECHELON_COMPANY";
+    case Echelon.ECHELON_BATTALION:
+      return "ECHELON_BATTALION";
+    case Echelon.ECHELON_REGIMENT:
+      return "ECHELON_REGIMENT";
+    case Echelon.ECHELON_BRIGADE:
+      return "ECHELON_BRIGADE";
+    case Echelon.ECHELON_DIVISION:
+      return "ECHELON_DIVISION";
+    case Echelon.ECHELON_CORPS:
+      return "ECHELON_CORPS";
+    case Echelon.ECHELON_ARMY:
+      return "ECHELON_ARMY";
+    case Echelon.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+/** / Base entity representing a trackable object with MIL-STD-2525E compliance */
+export interface Object {
+  /** / Unique identifier (16-byte binary ULID) */
+  objectId: Uint8Array;
+  /** / Standard Identity (Friend/Hostile/Neutral/etc.) */
+  standardIdentity: StandardIdentity;
+  /** / Symbol Set (Air, Land, Sea, etc.) */
+  symbolSet: SymbolSet;
+  airEntity?: AirEntity | undefined;
+  landEquipmentEntity?: LandEquipmentEntity | undefined;
+  seaEntity?:
+    | SeaEntity
+    | undefined;
+  /** / Status (Operational condition) */
+  status: ObjectStatus;
+  /** / Context (Reality/Exercise/Simulation) */
+  context: Context;
+  /** / Echelon/Mobility (for units) */
+  echelon?:
+    | Echelon
+    | undefined;
+  /** / Operational Condition Amplifier */
+  operationalCondition?:
+    | OperationalCondition
+    | undefined;
+  /** / GPS Coordinates */
+  longitude: number;
+  latitude: number;
+  /** / Altitude MSL (Mean Sea Level) in feet */
+  altitude: number;
+  /** / Heading in degrees (0-360) */
+  heading: number;
+  /** / Speed in knots */
+  speed?:
+    | number
+    | undefined;
+  /** / Vertical speed (climb/descent rate) in feet per minute */
+  verticalSpeed?:
+    | number
+    | undefined;
+  /** / Fuel remaining as percentage (0-100) */
+  fuelPercentage?:
+    | number
+    | undefined;
+  /** / Ammunition/weapons remaining as percentage (0-100) */
+  ammoPercentage?:
+    | number
+    | undefined;
+  /** / Battery/Power remaining (for UAVs) as percentage (0-100) */
+  batteryPercentage?:
+    | number
+    | undefined;
+  /** / Human-readable callsign (e.g., "EAGLE-1", "REAPER-3", "ALPHA-ACTUAL") */
+  callsign?:
+    | string
+    | undefined;
+  /** / Platform model/type (e.g., "MQ-9 Reaper", "F-16C", "M1A2 Abrams") */
+  model?:
+    | string
+    | undefined;
+  /** / Unit designation (e.g., "432d Wing", "1st Battalion", "CVN-68") */
+  unit?:
+    | string
+    | undefined;
+  /** / Higher headquarters or controlling unit */
+  higherFormation?:
+    | string
+    | undefined;
+  /** / Unique name/designation */
+  uniqueDesignation?:
+    | string
+    | undefined;
+  /** / Additional text modifiers for display */
+  additionalInformation?:
+    | string
+    | undefined;
+  /** / When this object was created/spawned (Unix timestamp) */
+  createdAt: number;
+  /** / Last update timestamp (Unix timestamp) */
+  updatedAt: number;
+  /** / Current task ID if assigned */
+  currentTaskId?:
+    | Uint8Array
+    | undefined;
+  /** / Home base or operating location */
+  homeBase?:
+    | Location
+    | undefined;
+  /** / Direction of movement (for movement indicators) */
+  directionOfMovement?:
+    | number
+    | undefined;
+  /** / Speed leader line length (for display) */
+  speedLeaderScale?:
+    | number
+    | undefined;
+  /** / Is currently engaged in combat */
+  isEngaged: boolean;
+  /** / Target object ID if engaging */
+  targetObjectId?:
+    | Uint8Array
+    | undefined;
+  /** / Threat level (1-5, where 5 is highest threat) */
+  threatLevel?: number | undefined;
+}
+
+/** / Represents a geographic location */
 export interface Location {
   longitude: number;
   latitude: number;
-  altitude?: number | undefined;
-  /** e.g., "Nellis AFB", "Forward Operating Base Alpha" */
-  name?: string | undefined;
+  altitude?:
+    | number
+    | undefined;
+  /** e.g., "KLAS", "Creech AFB", "FOB Alpha" */
+  name?:
+    | string
+    | undefined;
+  /** Military Grid Reference System coordinate */
+  mgrs?: string | undefined;
 }
 
-/** / Represents a task or mission assigned to an Object. */
+/** / Represents a task or mission assigned to an Object */
 export interface Task {
-  /** / Unique task identifier (16-byte binary ULID). */
+  /** / Unique task identifier (16-byte binary ULID) */
   taskId: Uint8Array;
-  /** / The ID of the object performing the task. */
+  /** / The ID of the object performing the task */
   assignedObjectId: Uint8Array;
-  /** / Optional target for the task. */
-  targetObjectId?: Uint8Array | undefined;
-  /** / Task type/description */
-  taskType?: string | undefined;
+  /** / Optional target for the task */
+  targetObjectId?:
+    | Uint8Array
+    | undefined;
+  /** / Task type (e.g., "CAP", "CAS", "ISR", "Strike", "Escort", "Intercept") */
+  taskType?:
+    | string
+    | undefined;
   /** / Task priority (1-10, higher is more important) */
-  priority?: number | undefined;
+  priority?:
+    | number
+    | undefined;
+  /** / Target area or waypoint */
+  targetLocation?:
+    | Location
+    | undefined;
   /** / Timestamps */
   createdAt: number;
   startedAt?: number | undefined;
-  completedAt?: number | undefined;
+  completedAt?:
+    | number
+    | undefined;
+  /** / Estimated time to complete (seconds) */
+  estimatedDuration?:
+    | number
+    | undefined;
+  /** / Task status */
+  status?: string | undefined;
 }
 
 export interface ObjectList {
@@ -305,95 +840,151 @@ export interface ObjectList {
 function createBaseObject(): Object {
   return {
     objectId: new Uint8Array(0),
-    designation: 0,
-    objectType: 0,
+    standardIdentity: 0,
+    symbolSet: 0,
+    airEntity: undefined,
+    landEquipmentEntity: undefined,
+    seaEntity: undefined,
+    status: 0,
+    context: 0,
+    echelon: undefined,
+    operationalCondition: undefined,
     longitude: 0,
     latitude: 0,
     altitude: 0,
     heading: 0,
     speed: undefined,
     verticalSpeed: undefined,
-    status: 0,
     fuelPercentage: undefined,
     ammoPercentage: undefined,
+    batteryPercentage: undefined,
     callsign: undefined,
     model: undefined,
     unit: undefined,
+    higherFormation: undefined,
+    uniqueDesignation: undefined,
+    additionalInformation: undefined,
     createdAt: 0,
     updatedAt: 0,
     currentTaskId: undefined,
     homeBase: undefined,
+    directionOfMovement: undefined,
+    speedLeaderScale: undefined,
+    isEngaged: false,
+    targetObjectId: undefined,
+    threatLevel: undefined,
   };
 }
 
 export const Object: MessageFns<Object> = {
-  encode(
-    message: Object,
-    writer: BinaryWriter = new BinaryWriter(),
-  ): BinaryWriter {
+  encode(message: Object, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.objectId.length !== 0) {
       writer.uint32(10).bytes(message.objectId);
     }
-    if (message.designation !== 0) {
-      writer.uint32(16).int32(message.designation);
+    if (message.standardIdentity !== 0) {
+      writer.uint32(16).int32(message.standardIdentity);
     }
-    if (message.objectType !== 0) {
-      writer.uint32(24).int32(message.objectType);
+    if (message.symbolSet !== 0) {
+      writer.uint32(24).int32(message.symbolSet);
     }
-    if (message.longitude !== 0) {
-      writer.uint32(37).float(message.longitude);
+    if (message.airEntity !== undefined) {
+      writer.uint32(32).int32(message.airEntity);
     }
-    if (message.latitude !== 0) {
-      writer.uint32(45).float(message.latitude);
+    if (message.landEquipmentEntity !== undefined) {
+      writer.uint32(40).int32(message.landEquipmentEntity);
     }
-    if (message.altitude !== 0) {
-      writer.uint32(53).float(message.altitude);
-    }
-    if (message.heading !== 0) {
-      writer.uint32(61).float(message.heading);
-    }
-    if (message.speed !== undefined) {
-      writer.uint32(69).float(message.speed);
-    }
-    if (message.verticalSpeed !== undefined) {
-      writer.uint32(77).float(message.verticalSpeed);
+    if (message.seaEntity !== undefined) {
+      writer.uint32(48).int32(message.seaEntity);
     }
     if (message.status !== 0) {
-      writer.uint32(80).int32(message.status);
+      writer.uint32(56).int32(message.status);
+    }
+    if (message.context !== 0) {
+      writer.uint32(64).int32(message.context);
+    }
+    if (message.echelon !== undefined) {
+      writer.uint32(72).int32(message.echelon);
+    }
+    if (message.operationalCondition !== undefined) {
+      writer.uint32(80).int32(message.operationalCondition);
+    }
+    if (message.longitude !== 0) {
+      writer.uint32(165).float(message.longitude);
+    }
+    if (message.latitude !== 0) {
+      writer.uint32(173).float(message.latitude);
+    }
+    if (message.altitude !== 0) {
+      writer.uint32(181).float(message.altitude);
+    }
+    if (message.heading !== 0) {
+      writer.uint32(189).float(message.heading);
+    }
+    if (message.speed !== undefined) {
+      writer.uint32(197).float(message.speed);
+    }
+    if (message.verticalSpeed !== undefined) {
+      writer.uint32(205).float(message.verticalSpeed);
     }
     if (message.fuelPercentage !== undefined) {
-      writer.uint32(93).float(message.fuelPercentage);
+      writer.uint32(245).float(message.fuelPercentage);
     }
     if (message.ammoPercentage !== undefined) {
-      writer.uint32(101).float(message.ammoPercentage);
+      writer.uint32(253).float(message.ammoPercentage);
+    }
+    if (message.batteryPercentage !== undefined) {
+      writer.uint32(261).float(message.batteryPercentage);
     }
     if (message.callsign !== undefined) {
-      writer.uint32(106).string(message.callsign);
+      writer.uint32(322).string(message.callsign);
     }
     if (message.model !== undefined) {
-      writer.uint32(114).string(message.model);
+      writer.uint32(330).string(message.model);
     }
     if (message.unit !== undefined) {
-      writer.uint32(122).string(message.unit);
+      writer.uint32(338).string(message.unit);
+    }
+    if (message.higherFormation !== undefined) {
+      writer.uint32(346).string(message.higherFormation);
+    }
+    if (message.uniqueDesignation !== undefined) {
+      writer.uint32(354).string(message.uniqueDesignation);
+    }
+    if (message.additionalInformation !== undefined) {
+      writer.uint32(362).string(message.additionalInformation);
     }
     if (message.createdAt !== 0) {
-      writer.uint32(128).int64(message.createdAt);
+      writer.uint32(400).int64(message.createdAt);
     }
     if (message.updatedAt !== 0) {
-      writer.uint32(136).int64(message.updatedAt);
+      writer.uint32(408).int64(message.updatedAt);
     }
     if (message.currentTaskId !== undefined) {
-      writer.uint32(146).bytes(message.currentTaskId);
+      writer.uint32(482).bytes(message.currentTaskId);
     }
     if (message.homeBase !== undefined) {
-      Location.encode(message.homeBase, writer.uint32(154).fork()).join();
+      Location.encode(message.homeBase, writer.uint32(490).fork()).join();
+    }
+    if (message.directionOfMovement !== undefined) {
+      writer.uint32(501).float(message.directionOfMovement);
+    }
+    if (message.speedLeaderScale !== undefined) {
+      writer.uint32(509).float(message.speedLeaderScale);
+    }
+    if (message.isEngaged !== false) {
+      writer.uint32(560).bool(message.isEngaged);
+    }
+    if (message.targetObjectId !== undefined) {
+      writer.uint32(570).bytes(message.targetObjectId);
+    }
+    if (message.threatLevel !== undefined) {
+      writer.uint32(576).int32(message.threatLevel);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): Object {
-    const reader =
-      input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseObject();
     while (reader.pos < end) {
@@ -412,7 +1003,7 @@ export const Object: MessageFns<Object> = {
             break;
           }
 
-          message.designation = reader.int32() as any;
+          message.standardIdentity = reader.int32() as any;
           continue;
         }
         case 3: {
@@ -420,55 +1011,55 @@ export const Object: MessageFns<Object> = {
             break;
           }
 
-          message.objectType = reader.int32() as any;
+          message.symbolSet = reader.int32() as any;
           continue;
         }
         case 4: {
-          if (tag !== 37) {
+          if (tag !== 32) {
             break;
           }
 
-          message.longitude = reader.float();
+          message.airEntity = reader.int32() as any;
           continue;
         }
         case 5: {
-          if (tag !== 45) {
+          if (tag !== 40) {
             break;
           }
 
-          message.latitude = reader.float();
+          message.landEquipmentEntity = reader.int32() as any;
           continue;
         }
         case 6: {
-          if (tag !== 53) {
+          if (tag !== 48) {
             break;
           }
 
-          message.altitude = reader.float();
+          message.seaEntity = reader.int32() as any;
           continue;
         }
         case 7: {
-          if (tag !== 61) {
+          if (tag !== 56) {
             break;
           }
 
-          message.heading = reader.float();
+          message.status = reader.int32() as any;
           continue;
         }
         case 8: {
-          if (tag !== 69) {
+          if (tag !== 64) {
             break;
           }
 
-          message.speed = reader.float();
+          message.context = reader.int32() as any;
           continue;
         }
         case 9: {
-          if (tag !== 77) {
+          if (tag !== 72) {
             break;
           }
 
-          message.verticalSpeed = reader.float();
+          message.echelon = reader.int32() as any;
           continue;
         }
         case 10: {
@@ -476,79 +1067,199 @@ export const Object: MessageFns<Object> = {
             break;
           }
 
-          message.status = reader.int32() as any;
+          message.operationalCondition = reader.int32() as any;
           continue;
         }
-        case 11: {
-          if (tag !== 93) {
+        case 20: {
+          if (tag !== 165) {
+            break;
+          }
+
+          message.longitude = reader.float();
+          continue;
+        }
+        case 21: {
+          if (tag !== 173) {
+            break;
+          }
+
+          message.latitude = reader.float();
+          continue;
+        }
+        case 22: {
+          if (tag !== 181) {
+            break;
+          }
+
+          message.altitude = reader.float();
+          continue;
+        }
+        case 23: {
+          if (tag !== 189) {
+            break;
+          }
+
+          message.heading = reader.float();
+          continue;
+        }
+        case 24: {
+          if (tag !== 197) {
+            break;
+          }
+
+          message.speed = reader.float();
+          continue;
+        }
+        case 25: {
+          if (tag !== 205) {
+            break;
+          }
+
+          message.verticalSpeed = reader.float();
+          continue;
+        }
+        case 30: {
+          if (tag !== 245) {
             break;
           }
 
           message.fuelPercentage = reader.float();
           continue;
         }
-        case 12: {
-          if (tag !== 101) {
+        case 31: {
+          if (tag !== 253) {
             break;
           }
 
           message.ammoPercentage = reader.float();
           continue;
         }
-        case 13: {
-          if (tag !== 106) {
+        case 32: {
+          if (tag !== 261) {
+            break;
+          }
+
+          message.batteryPercentage = reader.float();
+          continue;
+        }
+        case 40: {
+          if (tag !== 322) {
             break;
           }
 
           message.callsign = reader.string();
           continue;
         }
-        case 14: {
-          if (tag !== 114) {
+        case 41: {
+          if (tag !== 330) {
             break;
           }
 
           message.model = reader.string();
           continue;
         }
-        case 15: {
-          if (tag !== 122) {
+        case 42: {
+          if (tag !== 338) {
             break;
           }
 
           message.unit = reader.string();
           continue;
         }
-        case 16: {
-          if (tag !== 128) {
+        case 43: {
+          if (tag !== 346) {
+            break;
+          }
+
+          message.higherFormation = reader.string();
+          continue;
+        }
+        case 44: {
+          if (tag !== 354) {
+            break;
+          }
+
+          message.uniqueDesignation = reader.string();
+          continue;
+        }
+        case 45: {
+          if (tag !== 362) {
+            break;
+          }
+
+          message.additionalInformation = reader.string();
+          continue;
+        }
+        case 50: {
+          if (tag !== 400) {
             break;
           }
 
           message.createdAt = longToNumber(reader.int64());
           continue;
         }
-        case 17: {
-          if (tag !== 136) {
+        case 51: {
+          if (tag !== 408) {
             break;
           }
 
           message.updatedAt = longToNumber(reader.int64());
           continue;
         }
-        case 18: {
-          if (tag !== 146) {
+        case 60: {
+          if (tag !== 482) {
             break;
           }
 
           message.currentTaskId = reader.bytes();
           continue;
         }
-        case 19: {
-          if (tag !== 154) {
+        case 61: {
+          if (tag !== 490) {
             break;
           }
 
           message.homeBase = Location.decode(reader, reader.uint32());
+          continue;
+        }
+        case 62: {
+          if (tag !== 501) {
+            break;
+          }
+
+          message.directionOfMovement = reader.float();
+          continue;
+        }
+        case 63: {
+          if (tag !== 509) {
+            break;
+          }
+
+          message.speedLeaderScale = reader.float();
+          continue;
+        }
+        case 70: {
+          if (tag !== 560) {
+            break;
+          }
+
+          message.isEngaged = reader.bool();
+          continue;
+        }
+        case 71: {
+          if (tag !== 570) {
+            break;
+          }
+
+          message.targetObjectId = reader.bytes();
+          continue;
+        }
+        case 72: {
+          if (tag !== 576) {
+            break;
+          }
+
+          message.threatLevel = reader.int32();
           continue;
         }
       }
@@ -565,19 +1276,42 @@ export const Object: MessageFns<Object> = {
       objectId: isSet(object.objectId)
         ? bytesFromBase64(object.objectId)
         : isSet(object.object_id)
-          ? bytesFromBase64(object.object_id)
-          : new Uint8Array(0),
-      designation: isSet(object.designation)
-        ? objectDesignationFromJSON(object.designation)
+        ? bytesFromBase64(object.object_id)
+        : new Uint8Array(0),
+      standardIdentity: isSet(object.standardIdentity)
+        ? standardIdentityFromJSON(object.standardIdentity)
+        : isSet(object.standard_identity)
+        ? standardIdentityFromJSON(object.standard_identity)
         : 0,
-      objectType: isSet(object.objectType)
-        ? objectTypeFromJSON(object.objectType)
-        : isSet(object.object_type)
-          ? objectTypeFromJSON(object.object_type)
-          : 0,
-      longitude: isSet(object.longitude)
-        ? globalThis.Number(object.longitude)
+      symbolSet: isSet(object.symbolSet)
+        ? symbolSetFromJSON(object.symbolSet)
+        : isSet(object.symbol_set)
+        ? symbolSetFromJSON(object.symbol_set)
         : 0,
+      airEntity: isSet(object.airEntity)
+        ? airEntityFromJSON(object.airEntity)
+        : isSet(object.air_entity)
+        ? airEntityFromJSON(object.air_entity)
+        : undefined,
+      landEquipmentEntity: isSet(object.landEquipmentEntity)
+        ? landEquipmentEntityFromJSON(object.landEquipmentEntity)
+        : isSet(object.land_equipment_entity)
+        ? landEquipmentEntityFromJSON(object.land_equipment_entity)
+        : undefined,
+      seaEntity: isSet(object.seaEntity)
+        ? seaEntityFromJSON(object.seaEntity)
+        : isSet(object.sea_entity)
+        ? seaEntityFromJSON(object.sea_entity)
+        : undefined,
+      status: isSet(object.status) ? objectStatusFromJSON(object.status) : 0,
+      context: isSet(object.context) ? contextFromJSON(object.context) : 0,
+      echelon: isSet(object.echelon) ? echelonFromJSON(object.echelon) : undefined,
+      operationalCondition: isSet(object.operationalCondition)
+        ? operationalConditionFromJSON(object.operationalCondition)
+        : isSet(object.operational_condition)
+        ? operationalConditionFromJSON(object.operational_condition)
+        : undefined,
+      longitude: isSet(object.longitude) ? globalThis.Number(object.longitude) : 0,
       latitude: isSet(object.latitude) ? globalThis.Number(object.latitude) : 0,
       altitude: isSet(object.altitude) ? globalThis.Number(object.altitude) : 0,
       heading: isSet(object.heading) ? globalThis.Number(object.heading) : 0,
@@ -585,44 +1319,86 @@ export const Object: MessageFns<Object> = {
       verticalSpeed: isSet(object.verticalSpeed)
         ? globalThis.Number(object.verticalSpeed)
         : isSet(object.vertical_speed)
-          ? globalThis.Number(object.vertical_speed)
-          : undefined,
-      status: isSet(object.status) ? objectStatusFromJSON(object.status) : 0,
+        ? globalThis.Number(object.vertical_speed)
+        : undefined,
       fuelPercentage: isSet(object.fuelPercentage)
         ? globalThis.Number(object.fuelPercentage)
         : isSet(object.fuel_percentage)
-          ? globalThis.Number(object.fuel_percentage)
-          : undefined,
+        ? globalThis.Number(object.fuel_percentage)
+        : undefined,
       ammoPercentage: isSet(object.ammoPercentage)
         ? globalThis.Number(object.ammoPercentage)
         : isSet(object.ammo_percentage)
-          ? globalThis.Number(object.ammo_percentage)
-          : undefined,
-      callsign: isSet(object.callsign)
-        ? globalThis.String(object.callsign)
+        ? globalThis.Number(object.ammo_percentage)
         : undefined,
+      batteryPercentage: isSet(object.batteryPercentage)
+        ? globalThis.Number(object.batteryPercentage)
+        : isSet(object.battery_percentage)
+        ? globalThis.Number(object.battery_percentage)
+        : undefined,
+      callsign: isSet(object.callsign) ? globalThis.String(object.callsign) : undefined,
       model: isSet(object.model) ? globalThis.String(object.model) : undefined,
       unit: isSet(object.unit) ? globalThis.String(object.unit) : undefined,
+      higherFormation: isSet(object.higherFormation)
+        ? globalThis.String(object.higherFormation)
+        : isSet(object.higher_formation)
+        ? globalThis.String(object.higher_formation)
+        : undefined,
+      uniqueDesignation: isSet(object.uniqueDesignation)
+        ? globalThis.String(object.uniqueDesignation)
+        : isSet(object.unique_designation)
+        ? globalThis.String(object.unique_designation)
+        : undefined,
+      additionalInformation: isSet(object.additionalInformation)
+        ? globalThis.String(object.additionalInformation)
+        : isSet(object.additional_information)
+        ? globalThis.String(object.additional_information)
+        : undefined,
       createdAt: isSet(object.createdAt)
         ? globalThis.Number(object.createdAt)
         : isSet(object.created_at)
-          ? globalThis.Number(object.created_at)
-          : 0,
+        ? globalThis.Number(object.created_at)
+        : 0,
       updatedAt: isSet(object.updatedAt)
         ? globalThis.Number(object.updatedAt)
         : isSet(object.updated_at)
-          ? globalThis.Number(object.updated_at)
-          : 0,
+        ? globalThis.Number(object.updated_at)
+        : 0,
       currentTaskId: isSet(object.currentTaskId)
         ? bytesFromBase64(object.currentTaskId)
         : isSet(object.current_task_id)
-          ? bytesFromBase64(object.current_task_id)
-          : undefined,
+        ? bytesFromBase64(object.current_task_id)
+        : undefined,
       homeBase: isSet(object.homeBase)
         ? Location.fromJSON(object.homeBase)
         : isSet(object.home_base)
-          ? Location.fromJSON(object.home_base)
-          : undefined,
+        ? Location.fromJSON(object.home_base)
+        : undefined,
+      directionOfMovement: isSet(object.directionOfMovement)
+        ? globalThis.Number(object.directionOfMovement)
+        : isSet(object.direction_of_movement)
+        ? globalThis.Number(object.direction_of_movement)
+        : undefined,
+      speedLeaderScale: isSet(object.speedLeaderScale)
+        ? globalThis.Number(object.speedLeaderScale)
+        : isSet(object.speed_leader_scale)
+        ? globalThis.Number(object.speed_leader_scale)
+        : undefined,
+      isEngaged: isSet(object.isEngaged)
+        ? globalThis.Boolean(object.isEngaged)
+        : isSet(object.is_engaged)
+        ? globalThis.Boolean(object.is_engaged)
+        : false,
+      targetObjectId: isSet(object.targetObjectId)
+        ? bytesFromBase64(object.targetObjectId)
+        : isSet(object.target_object_id)
+        ? bytesFromBase64(object.target_object_id)
+        : undefined,
+      threatLevel: isSet(object.threatLevel)
+        ? globalThis.Number(object.threatLevel)
+        : isSet(object.threat_level)
+        ? globalThis.Number(object.threat_level)
+        : undefined,
     };
   },
 
@@ -631,11 +1407,32 @@ export const Object: MessageFns<Object> = {
     if (message.objectId.length !== 0) {
       obj.objectId = base64FromBytes(message.objectId);
     }
-    if (message.designation !== 0) {
-      obj.designation = objectDesignationToJSON(message.designation);
+    if (message.standardIdentity !== 0) {
+      obj.standardIdentity = standardIdentityToJSON(message.standardIdentity);
     }
-    if (message.objectType !== 0) {
-      obj.objectType = objectTypeToJSON(message.objectType);
+    if (message.symbolSet !== 0) {
+      obj.symbolSet = symbolSetToJSON(message.symbolSet);
+    }
+    if (message.airEntity !== undefined) {
+      obj.airEntity = airEntityToJSON(message.airEntity);
+    }
+    if (message.landEquipmentEntity !== undefined) {
+      obj.landEquipmentEntity = landEquipmentEntityToJSON(message.landEquipmentEntity);
+    }
+    if (message.seaEntity !== undefined) {
+      obj.seaEntity = seaEntityToJSON(message.seaEntity);
+    }
+    if (message.status !== 0) {
+      obj.status = objectStatusToJSON(message.status);
+    }
+    if (message.context !== 0) {
+      obj.context = contextToJSON(message.context);
+    }
+    if (message.echelon !== undefined) {
+      obj.echelon = echelonToJSON(message.echelon);
+    }
+    if (message.operationalCondition !== undefined) {
+      obj.operationalCondition = operationalConditionToJSON(message.operationalCondition);
     }
     if (message.longitude !== 0) {
       obj.longitude = message.longitude;
@@ -655,14 +1452,14 @@ export const Object: MessageFns<Object> = {
     if (message.verticalSpeed !== undefined) {
       obj.verticalSpeed = message.verticalSpeed;
     }
-    if (message.status !== 0) {
-      obj.status = objectStatusToJSON(message.status);
-    }
     if (message.fuelPercentage !== undefined) {
       obj.fuelPercentage = message.fuelPercentage;
     }
     if (message.ammoPercentage !== undefined) {
       obj.ammoPercentage = message.ammoPercentage;
+    }
+    if (message.batteryPercentage !== undefined) {
+      obj.batteryPercentage = message.batteryPercentage;
     }
     if (message.callsign !== undefined) {
       obj.callsign = message.callsign;
@@ -672,6 +1469,15 @@ export const Object: MessageFns<Object> = {
     }
     if (message.unit !== undefined) {
       obj.unit = message.unit;
+    }
+    if (message.higherFormation !== undefined) {
+      obj.higherFormation = message.higherFormation;
+    }
+    if (message.uniqueDesignation !== undefined) {
+      obj.uniqueDesignation = message.uniqueDesignation;
+    }
+    if (message.additionalInformation !== undefined) {
+      obj.additionalInformation = message.additionalInformation;
     }
     if (message.createdAt !== 0) {
       obj.createdAt = Math.round(message.createdAt);
@@ -685,6 +1491,21 @@ export const Object: MessageFns<Object> = {
     if (message.homeBase !== undefined) {
       obj.homeBase = Location.toJSON(message.homeBase);
     }
+    if (message.directionOfMovement !== undefined) {
+      obj.directionOfMovement = message.directionOfMovement;
+    }
+    if (message.speedLeaderScale !== undefined) {
+      obj.speedLeaderScale = message.speedLeaderScale;
+    }
+    if (message.isEngaged !== false) {
+      obj.isEngaged = message.isEngaged;
+    }
+    if (message.targetObjectId !== undefined) {
+      obj.targetObjectId = base64FromBytes(message.targetObjectId);
+    }
+    if (message.threatLevel !== undefined) {
+      obj.threatLevel = Math.round(message.threatLevel);
+    }
     return obj;
   },
 
@@ -694,40 +1515,51 @@ export const Object: MessageFns<Object> = {
   fromPartial<I extends Exact<DeepPartial<Object>, I>>(object: I): Object {
     const message = createBaseObject();
     message.objectId = object.objectId ?? new Uint8Array(0);
-    message.designation = object.designation ?? 0;
-    message.objectType = object.objectType ?? 0;
+    message.standardIdentity = object.standardIdentity ?? 0;
+    message.symbolSet = object.symbolSet ?? 0;
+    message.airEntity = object.airEntity ?? undefined;
+    message.landEquipmentEntity = object.landEquipmentEntity ?? undefined;
+    message.seaEntity = object.seaEntity ?? undefined;
+    message.status = object.status ?? 0;
+    message.context = object.context ?? 0;
+    message.echelon = object.echelon ?? undefined;
+    message.operationalCondition = object.operationalCondition ?? undefined;
     message.longitude = object.longitude ?? 0;
     message.latitude = object.latitude ?? 0;
     message.altitude = object.altitude ?? 0;
     message.heading = object.heading ?? 0;
     message.speed = object.speed ?? undefined;
     message.verticalSpeed = object.verticalSpeed ?? undefined;
-    message.status = object.status ?? 0;
     message.fuelPercentage = object.fuelPercentage ?? undefined;
     message.ammoPercentage = object.ammoPercentage ?? undefined;
+    message.batteryPercentage = object.batteryPercentage ?? undefined;
     message.callsign = object.callsign ?? undefined;
     message.model = object.model ?? undefined;
     message.unit = object.unit ?? undefined;
+    message.higherFormation = object.higherFormation ?? undefined;
+    message.uniqueDesignation = object.uniqueDesignation ?? undefined;
+    message.additionalInformation = object.additionalInformation ?? undefined;
     message.createdAt = object.createdAt ?? 0;
     message.updatedAt = object.updatedAt ?? 0;
     message.currentTaskId = object.currentTaskId ?? undefined;
-    message.homeBase =
-      object.homeBase !== undefined && object.homeBase !== null
-        ? Location.fromPartial(object.homeBase)
-        : undefined;
+    message.homeBase = (object.homeBase !== undefined && object.homeBase !== null)
+      ? Location.fromPartial(object.homeBase)
+      : undefined;
+    message.directionOfMovement = object.directionOfMovement ?? undefined;
+    message.speedLeaderScale = object.speedLeaderScale ?? undefined;
+    message.isEngaged = object.isEngaged ?? false;
+    message.targetObjectId = object.targetObjectId ?? undefined;
+    message.threatLevel = object.threatLevel ?? undefined;
     return message;
   },
 };
 
 function createBaseLocation(): Location {
-  return { longitude: 0, latitude: 0, altitude: undefined, name: undefined };
+  return { longitude: 0, latitude: 0, altitude: undefined, name: undefined, mgrs: undefined };
 }
 
 export const Location: MessageFns<Location> = {
-  encode(
-    message: Location,
-    writer: BinaryWriter = new BinaryWriter(),
-  ): BinaryWriter {
+  encode(message: Location, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.longitude !== 0) {
       writer.uint32(13).float(message.longitude);
     }
@@ -740,12 +1572,14 @@ export const Location: MessageFns<Location> = {
     if (message.name !== undefined) {
       writer.uint32(34).string(message.name);
     }
+    if (message.mgrs !== undefined) {
+      writer.uint32(42).string(message.mgrs);
+    }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): Location {
-    const reader =
-      input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseLocation();
     while (reader.pos < end) {
@@ -783,6 +1617,14 @@ export const Location: MessageFns<Location> = {
           message.name = reader.string();
           continue;
         }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.mgrs = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -794,14 +1636,11 @@ export const Location: MessageFns<Location> = {
 
   fromJSON(object: any): Location {
     return {
-      longitude: isSet(object.longitude)
-        ? globalThis.Number(object.longitude)
-        : 0,
+      longitude: isSet(object.longitude) ? globalThis.Number(object.longitude) : 0,
       latitude: isSet(object.latitude) ? globalThis.Number(object.latitude) : 0,
-      altitude: isSet(object.altitude)
-        ? globalThis.Number(object.altitude)
-        : undefined,
+      altitude: isSet(object.altitude) ? globalThis.Number(object.altitude) : undefined,
       name: isSet(object.name) ? globalThis.String(object.name) : undefined,
+      mgrs: isSet(object.mgrs) ? globalThis.String(object.mgrs) : undefined,
     };
   },
 
@@ -819,6 +1658,9 @@ export const Location: MessageFns<Location> = {
     if (message.name !== undefined) {
       obj.name = message.name;
     }
+    if (message.mgrs !== undefined) {
+      obj.mgrs = message.mgrs;
+    }
     return obj;
   },
 
@@ -831,6 +1673,7 @@ export const Location: MessageFns<Location> = {
     message.latitude = object.latitude ?? 0;
     message.altitude = object.altitude ?? undefined;
     message.name = object.name ?? undefined;
+    message.mgrs = object.mgrs ?? undefined;
     return message;
   },
 };
@@ -842,17 +1685,17 @@ function createBaseTask(): Task {
     targetObjectId: undefined,
     taskType: undefined,
     priority: undefined,
+    targetLocation: undefined,
     createdAt: 0,
     startedAt: undefined,
     completedAt: undefined,
+    estimatedDuration: undefined,
+    status: undefined,
   };
 }
 
 export const Task: MessageFns<Task> = {
-  encode(
-    message: Task,
-    writer: BinaryWriter = new BinaryWriter(),
-  ): BinaryWriter {
+  encode(message: Task, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.taskId.length !== 0) {
       writer.uint32(10).bytes(message.taskId);
     }
@@ -868,21 +1711,29 @@ export const Task: MessageFns<Task> = {
     if (message.priority !== undefined) {
       writer.uint32(40).int32(message.priority);
     }
+    if (message.targetLocation !== undefined) {
+      Location.encode(message.targetLocation, writer.uint32(50).fork()).join();
+    }
     if (message.createdAt !== 0) {
-      writer.uint32(48).int64(message.createdAt);
+      writer.uint32(80).int64(message.createdAt);
     }
     if (message.startedAt !== undefined) {
-      writer.uint32(56).int64(message.startedAt);
+      writer.uint32(88).int64(message.startedAt);
     }
     if (message.completedAt !== undefined) {
-      writer.uint32(64).int64(message.completedAt);
+      writer.uint32(96).int64(message.completedAt);
+    }
+    if (message.estimatedDuration !== undefined) {
+      writer.uint32(104).int64(message.estimatedDuration);
+    }
+    if (message.status !== undefined) {
+      writer.uint32(114).string(message.status);
     }
     return writer;
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): Task {
-    const reader =
-      input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseTask();
     while (reader.pos < end) {
@@ -929,27 +1780,51 @@ export const Task: MessageFns<Task> = {
           continue;
         }
         case 6: {
-          if (tag !== 48) {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.targetLocation = Location.decode(reader, reader.uint32());
+          continue;
+        }
+        case 10: {
+          if (tag !== 80) {
             break;
           }
 
           message.createdAt = longToNumber(reader.int64());
           continue;
         }
-        case 7: {
-          if (tag !== 56) {
+        case 11: {
+          if (tag !== 88) {
             break;
           }
 
           message.startedAt = longToNumber(reader.int64());
           continue;
         }
-        case 8: {
-          if (tag !== 64) {
+        case 12: {
+          if (tag !== 96) {
             break;
           }
 
           message.completedAt = longToNumber(reader.int64());
+          continue;
+        }
+        case 13: {
+          if (tag !== 104) {
+            break;
+          }
+
+          message.estimatedDuration = longToNumber(reader.int64());
+          continue;
+        }
+        case 14: {
+          if (tag !== 114) {
+            break;
+          }
+
+          message.status = reader.string();
           continue;
         }
       }
@@ -966,41 +1841,50 @@ export const Task: MessageFns<Task> = {
       taskId: isSet(object.taskId)
         ? bytesFromBase64(object.taskId)
         : isSet(object.task_id)
-          ? bytesFromBase64(object.task_id)
-          : new Uint8Array(0),
+        ? bytesFromBase64(object.task_id)
+        : new Uint8Array(0),
       assignedObjectId: isSet(object.assignedObjectId)
         ? bytesFromBase64(object.assignedObjectId)
         : isSet(object.assigned_object_id)
-          ? bytesFromBase64(object.assigned_object_id)
-          : new Uint8Array(0),
+        ? bytesFromBase64(object.assigned_object_id)
+        : new Uint8Array(0),
       targetObjectId: isSet(object.targetObjectId)
         ? bytesFromBase64(object.targetObjectId)
         : isSet(object.target_object_id)
-          ? bytesFromBase64(object.target_object_id)
-          : undefined,
+        ? bytesFromBase64(object.target_object_id)
+        : undefined,
       taskType: isSet(object.taskType)
         ? globalThis.String(object.taskType)
         : isSet(object.task_type)
-          ? globalThis.String(object.task_type)
-          : undefined,
-      priority: isSet(object.priority)
-        ? globalThis.Number(object.priority)
+        ? globalThis.String(object.task_type)
+        : undefined,
+      priority: isSet(object.priority) ? globalThis.Number(object.priority) : undefined,
+      targetLocation: isSet(object.targetLocation)
+        ? Location.fromJSON(object.targetLocation)
+        : isSet(object.target_location)
+        ? Location.fromJSON(object.target_location)
         : undefined,
       createdAt: isSet(object.createdAt)
         ? globalThis.Number(object.createdAt)
         : isSet(object.created_at)
-          ? globalThis.Number(object.created_at)
-          : 0,
+        ? globalThis.Number(object.created_at)
+        : 0,
       startedAt: isSet(object.startedAt)
         ? globalThis.Number(object.startedAt)
         : isSet(object.started_at)
-          ? globalThis.Number(object.started_at)
-          : undefined,
+        ? globalThis.Number(object.started_at)
+        : undefined,
       completedAt: isSet(object.completedAt)
         ? globalThis.Number(object.completedAt)
         : isSet(object.completed_at)
-          ? globalThis.Number(object.completed_at)
-          : undefined,
+        ? globalThis.Number(object.completed_at)
+        : undefined,
+      estimatedDuration: isSet(object.estimatedDuration)
+        ? globalThis.Number(object.estimatedDuration)
+        : isSet(object.estimated_duration)
+        ? globalThis.Number(object.estimated_duration)
+        : undefined,
+      status: isSet(object.status) ? globalThis.String(object.status) : undefined,
     };
   },
 
@@ -1021,6 +1905,9 @@ export const Task: MessageFns<Task> = {
     if (message.priority !== undefined) {
       obj.priority = Math.round(message.priority);
     }
+    if (message.targetLocation !== undefined) {
+      obj.targetLocation = Location.toJSON(message.targetLocation);
+    }
     if (message.createdAt !== 0) {
       obj.createdAt = Math.round(message.createdAt);
     }
@@ -1029,6 +1916,12 @@ export const Task: MessageFns<Task> = {
     }
     if (message.completedAt !== undefined) {
       obj.completedAt = Math.round(message.completedAt);
+    }
+    if (message.estimatedDuration !== undefined) {
+      obj.estimatedDuration = Math.round(message.estimatedDuration);
+    }
+    if (message.status !== undefined) {
+      obj.status = message.status;
     }
     return obj;
   },
@@ -1043,9 +1936,14 @@ export const Task: MessageFns<Task> = {
     message.targetObjectId = object.targetObjectId ?? undefined;
     message.taskType = object.taskType ?? undefined;
     message.priority = object.priority ?? undefined;
+    message.targetLocation = (object.targetLocation !== undefined && object.targetLocation !== null)
+      ? Location.fromPartial(object.targetLocation)
+      : undefined;
     message.createdAt = object.createdAt ?? 0;
     message.startedAt = object.startedAt ?? undefined;
     message.completedAt = object.completedAt ?? undefined;
+    message.estimatedDuration = object.estimatedDuration ?? undefined;
+    message.status = object.status ?? undefined;
     return message;
   },
 };
@@ -1055,10 +1953,7 @@ function createBaseObjectList(): ObjectList {
 }
 
 export const ObjectList: MessageFns<ObjectList> = {
-  encode(
-    message: ObjectList,
-    writer: BinaryWriter = new BinaryWriter(),
-  ): BinaryWriter {
+  encode(message: ObjectList, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     for (const v of message.objects) {
       Object.encode(v!, writer.uint32(10).fork()).join();
     }
@@ -1066,8 +1961,7 @@ export const ObjectList: MessageFns<ObjectList> = {
   },
 
   decode(input: BinaryReader | Uint8Array, length?: number): ObjectList {
-    const reader =
-      input instanceof BinaryReader ? input : new BinaryReader(input);
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseObjectList();
     while (reader.pos < end) {
@@ -1092,9 +1986,7 @@ export const ObjectList: MessageFns<ObjectList> = {
 
   fromJSON(object: any): ObjectList {
     return {
-      objects: globalThis.Array.isArray(object?.objects)
-        ? object.objects.map((e: any) => Object.fromJSON(e))
-        : [],
+      objects: globalThis.Array.isArray(object?.objects) ? object.objects.map((e: any) => Object.fromJSON(e)) : [],
     };
   },
 
@@ -1109,9 +2001,7 @@ export const ObjectList: MessageFns<ObjectList> = {
   create<I extends Exact<DeepPartial<ObjectList>, I>>(base?: I): ObjectList {
     return ObjectList.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ObjectList>, I>>(
-    object: I,
-  ): ObjectList {
+  fromPartial<I extends Exact<DeepPartial<ObjectList>, I>>(object: I): ObjectList {
     const message = createBaseObjectList();
     message.objects = object.objects?.map((e) => Object.fromPartial(e)) || [];
     return message;
@@ -1120,7 +2010,7 @@ export const ObjectList: MessageFns<ObjectList> = {
 
 function bytesFromBase64(b64: string): Uint8Array {
   if ((globalThis as any).Buffer) {
-    return Uint8Array.from((globalThis as any).Buffer.from(b64, "base64"));
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
     const bin = globalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
@@ -1133,7 +2023,7 @@ function bytesFromBase64(b64: string): Uint8Array {
 
 function base64FromBytes(arr: Uint8Array): string {
   if ((globalThis as any).Buffer) {
-    return (globalThis as any).Buffer.from(arr).toString("base64");
+    return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
@@ -1143,31 +2033,17 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends globalThis.Array<infer U>
-    ? globalThis.Array<DeepPartial<U>>
-    : T extends ReadonlyArray<infer U>
-      ? ReadonlyArray<DeepPartial<U>>
-      : T extends {}
-        ? { [K in keyof T]?: DeepPartial<T[K]> }
-        : Partial<T>;
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin
-  ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & {
-      [K in Exclude<keyof I, KeysOfUnion<P>>]: never;
-    };
+export type Exact<P, I extends P> = P extends Builtin ? P
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
 
 function longToNumber(int64: { toString(): string }): number {
   const num = globalThis.Number(int64.toString());

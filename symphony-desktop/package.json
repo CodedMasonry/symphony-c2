@@ -24,6 +24,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "core": "link:@tauri-apps/api/core",
+    "milsymbol": "^3.0.3",
     "path": "^0.12.7",
     "radix-ui": "^1.4.3",
     "react": "^19.2.4",

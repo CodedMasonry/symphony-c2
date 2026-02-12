@@ -3,22 +3,23 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ObjectDesignation } from "@/generated/base";
+import { SymbolSet, StandardIdentity } from "@/generated/base";
 import { DesignationSection } from "./designation-section";
-import { DESIGNATION_ORDER } from "./constants";
+import { SYMBOL_SET_ORDER } from "./constants";
+import { ObjectWithUlid as ObjectWithId } from "@/lib/proto_api";
 
 interface SidebarContentProps {
   loading: boolean;
   error: string | null;
   objectCount: number;
-  groupedObjects: Map<ObjectDesignation, any[]>;
-  selectedDesignations: ObjectDesignation[];
+  groupedObjects: Map<SymbolSet, ObjectWithId[]>;
+  selectedIdentities: StandardIdentity[]; // Prop type fixed
   selectedObjectId?: string | null;
-  isSectionOpen: (designation: ObjectDesignation) => boolean;
-  onToggleSection: (designation: ObjectDesignation) => void;
+  isSectionOpen: (symbolSet: SymbolSet) => boolean;
+  onToggleSection: (symbolSet: SymbolSet) => void;
   onRetry: () => void;
   onObjectSelect?: (objectId: string | null) => void;
-  onObjectFlyTo?: (object: any) => void;
+  onObjectFlyTo?: (object: ObjectWithId) => void;
 }
 
 export function SidebarContent({
@@ -26,7 +27,6 @@ export function SidebarContent({
   error,
   objectCount,
   groupedObjects,
-  selectedDesignations,
   selectedObjectId,
   isSectionOpen,
   onToggleSection,
@@ -37,50 +37,40 @@ export function SidebarContent({
   if (loading && objectCount === 0) {
     return (
       <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full px-4">
-          <div className="py-4">
-            <div className="flex items-center justify-center py-8">
-              <HugeiconsIcon
-                icon={LoaderCircle}
-                strokeWidth={2}
-                className="h-6 w-6 animate-spin text-muted-foreground"
-              />
-            </div>
-          </div>
-        </ScrollArea>
+        <div className="py-8 flex items-center justify-center">
+          <HugeiconsIcon
+            icon={LoaderCircle}
+            className="h-6 w-6 animate-spin text-muted-foreground"
+          />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full px-4">
-          <div className="py-4">
-            <Card className="border-destructive">
-              <CardContent className="pt-6">
-                <p className="text-sm text-destructive mb-4">{error}</p>
-                <Button onClick={onRetry} variant="outline" className="w-full">
-                  Retry
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </ScrollArea>
+      <div className="flex-1 overflow-hidden p-4">
+        <Card className="border-destructive">
+          <CardContent className="pt-6 text-center">
+            <p className="text-sm text-destructive mb-4">{error}</p>
+            <Button
+              onClick={onRetry}
+              variant="outline"
+              size="sm"
+              className="w-full"
+            >
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   if (objectCount === 0) {
     return (
-      <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full px-4">
-          <div className="py-4">
-            <div className="text-center py-8 text-muted-foreground">
-              <p className="text-sm">No objects found</p>
-            </div>
-          </div>
-        </ScrollArea>
+      <div className="flex-1 overflow-hidden py-8 text-center text-muted-foreground text-sm">
+        No objects found
       </div>
     );
   }
@@ -89,19 +79,18 @@ export function SidebarContent({
     <div className="flex-1 overflow-hidden">
       <ScrollArea className="h-full px-4">
         <div className="py-4 space-y-2">
-          {DESIGNATION_ORDER.map((designation) => {
-            const objectsInGroup = groupedObjects.get(designation);
-            const isVisible = selectedDesignations.includes(designation);
-            if (!objectsInGroup || objectsInGroup.length === 0 || !isVisible) {
-              return null;
-            }
+          {SYMBOL_SET_ORDER.map((symbolSet) => {
+            const objectsInGroup = groupedObjects.get(symbolSet);
+            // We only show the section if it has objects that passed the identity/search filter
+            if (!objectsInGroup?.length) return null;
+
             return (
               <DesignationSection
-                key={designation}
-                designation={designation}
+                key={symbolSet}
+                symbolSet={symbolSet}
                 objects={objectsInGroup}
-                isOpen={isSectionOpen(designation)}
-                onToggle={() => onToggleSection(designation)}
+                isOpen={isSectionOpen(symbolSet)}
+                onToggle={() => onToggleSection(symbolSet)}
                 selectedObjectId={selectedObjectId}
                 onObjectSelect={onObjectSelect}
                 onObjectFlyTo={onObjectFlyTo}

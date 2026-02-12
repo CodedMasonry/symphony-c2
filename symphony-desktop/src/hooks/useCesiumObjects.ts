@@ -1,95 +1,167 @@
 import { useEffect, useRef } from "react";
 import * as Cesium from "cesium";
+import ms from "milsymbol";
+
 import { useObjectsStore } from "@/stores/objectsStore";
 import { ObjectWithUlid } from "@/lib/proto_api";
-import { ObjectStatus } from "@/generated/base";
-import { getBaseIcon, getDesignationColor } from "@/lib/icon-assets";
+
+import {
+  StandardIdentity,
+  SymbolSet,
+  ObjectStatus,
+  AirEntity,
+  LandEquipmentEntity,
+  SeaEntity,
+} from "@/generated/base";
+
+/* ───────────────────────── 2525E MAPPINGS ───────────────────────── */
+
+function identityToAffiliation(identity: StandardIdentity): string {
+  switch (identity) {
+    case StandardIdentity.STANDARD_IDENTITY_FRIEND:
+      return "F";
+    case StandardIdentity.STANDARD_IDENTITY_HOSTILE:
+      return "H";
+    case StandardIdentity.STANDARD_IDENTITY_NEUTRAL:
+      return "N";
+    case StandardIdentity.STANDARD_IDENTITY_SUSPECT:
+      return "S";
+    case StandardIdentity.STANDARD_IDENTITY_ASSUMED_FRIEND:
+      return "A";
+    case StandardIdentity.STANDARD_IDENTITY_PENDING:
+      return "P";
+    default:
+      return "U";
+  }
+}
+
+function statusToCode(status: ObjectStatus): string {
+  switch (status) {
+    case ObjectStatus.OBJECT_STATUS_ANTICIPATED:
+      return "A";
+    default:
+      return "P";
+  }
+}
+
+function symbolSetToBattleDimension(set: SymbolSet): string {
+  switch (set) {
+    case SymbolSet.SYMBOL_SET_AIR:
+    case SymbolSet.SYMBOL_SET_AIR_MISSILE:
+      return "A";
+    case SymbolSet.SYMBOL_SET_SPACE:
+      return "P";
+    case SymbolSet.SYMBOL_SET_LAND_UNIT:
+    case SymbolSet.SYMBOL_SET_LAND_EQUIPMENT:
+      return "G";
+    case SymbolSet.SYMBOL_SET_SEA_SURFACE:
+      return "S";
+    case SymbolSet.SYMBOL_SET_SEA_SUBSURFACE:
+      return "U";
+    default:
+      return "G";
+  }
+}
+
+/* ───────────────────────── FUNCTION ID MAPPING ───────────────────────── */
+
+function getFunctionId(obj: ObjectWithUlid): string {
+  switch (obj.symbolSet) {
+    case SymbolSet.SYMBOL_SET_AIR:
+      switch (obj.airEntity) {
+        case AirEntity.AIR_ENTITY_UAV_FIXED_WING:
+          return "110100";
+        case AirEntity.AIR_ENTITY_UAV_ROTARY_WING:
+          return "110200";
+        case AirEntity.AIR_ENTITY_MILITARY_AIRCRAFT:
+          return "110000";
+        case AirEntity.AIR_ENTITY_MILITARY_HELICOPTER:
+          return "120000";
+        case AirEntity.AIR_ENTITY_MISSILE:
+          return "210000";
+        default:
+          return "000000";
+      }
+
+    case SymbolSet.SYMBOL_SET_LAND_EQUIPMENT:
+      switch (obj.landEquipmentEntity) {
+        case LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_TANK:
+          return "130000";
+        case LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_ARMORED_VEHICLE:
+          return "120000";
+        case LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_APC:
+          return "140000";
+        case LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_GROUND_STATION:
+          return "190000";
+        case LandEquipmentEntity.LAND_EQUIPMENT_ENTITY_LAUNCHER:
+          return "410000";
+        default:
+          return "000000";
+      }
+
+    case SymbolSet.SYMBOL_SET_SEA_SURFACE:
+      switch (obj.seaEntity) {
+        case SeaEntity.SEA_ENTITY_CARRIER:
+          return "120000";
+        case SeaEntity.SEA_ENTITY_DESTROYER:
+          return "140000";
+        case SeaEntity.SEA_ENTITY_FRIGATE:
+          return "150000";
+        case SeaEntity.SEA_ENTITY_USV:
+          return "180000";
+        default:
+          return "110000";
+      }
+
+    default:
+      return "000000";
+  }
+}
+
+/* ───────────────────────── SIDC BUILDER ───────────────────────── */
+
+function buildSIDC(obj: ObjectWithUlid): string {
+  const version = "10";
+  const affiliation = identityToAffiliation(obj.standardIdentity);
+  const battleDimension = symbolSetToBattleDimension(obj.symbolSet);
+  const status = statusToCode(obj.status);
+  const functionId = getFunctionId(obj);
+
+  return `${version}${affiliation}${battleDimension}${status}${functionId}0000`;
+}
 
 /* ───────────────────────── ICON CACHE ───────────────────────── */
 
 const iconCache = new Map<string, HTMLCanvasElement>();
 
 function iconKey(obj: ObjectWithUlid, selected: boolean) {
-  return [obj.objectType, obj.designation, obj.status, selected].join("|");
+  return [
+    obj.standardIdentity,
+    obj.symbolSet,
+    obj.airEntity,
+    obj.landEquipmentEntity,
+    obj.seaEntity,
+    obj.status,
+    obj.echelon,
+    selected,
+  ].join("|");
 }
 
-async function loadImage(src: string) {
-  return new Promise<HTMLImageElement>((res, rej) => {
-    const img = new Image();
-    img.onload = () => res(img);
-    img.onerror = rej;
-    img.src = src;
-  });
-}
-
-async function buildIcon(obj: ObjectWithUlid, selected: boolean) {
+function buildIcon(obj: ObjectWithUlid, selected: boolean) {
   const key = iconKey(obj, selected);
   if (iconCache.has(key)) return iconCache.get(key)!;
 
-  const canvas = document.createElement("canvas");
-  canvas.width = 64;
-  canvas.height = 64;
-  const ctx = canvas.getContext("2d")!;
+  const sidc = buildSIDC(obj);
 
-  // CONFIG: Adjust this to change the "gap"
-  const PADDING = 4;
-  const ICON_SIZE = 64 - PADDING * 2;
+  const symbol = new ms.Symbol(sidc, {
+    size: 60,
+    direction: obj.directionOfMovement ?? obj.heading ?? 0,
+    uniqueDesignation: obj.callsign,
+    higherFormation: obj.unit,
+    outlineWidth: selected ? 6 : 2,
+  });
 
-  // 1. Draw Base Icon (Shrunk & Centered)
-  const base = getBaseIcon(obj.objectType);
-  if (base) {
-    const img = await loadImage(base);
-    // Draw centered with padding
-    ctx.drawImage(img, PADDING, PADDING, ICON_SIZE, ICON_SIZE);
-
-    ctx.globalCompositeOperation = "source-atop";
-    ctx.fillStyle = getDesignationColor(obj.designation);
-    // Color only the shrunken icon area
-    ctx.fillRect(PADDING, PADDING, ICON_SIZE, ICON_SIZE);
-    ctx.globalCompositeOperation = "source-over";
-  }
-
-  // 2. Selection "Pipes" (Moved to the very edges)
-  if (selected) {
-    const primary =
-      getComputedStyle(document.documentElement)
-        .getPropertyValue("--primary")
-        .trim() || "#ffffff";
-
-    ctx.strokeStyle = primary;
-    ctx.lineWidth = 3;
-    ctx.lineCap = "round";
-
-    // Draw pipes at x=2 and x=62 to maximize distance from icon
-    ctx.beginPath();
-    ctx.moveTo(3, 12);
-    ctx.lineTo(3, 52); // Left Pipe
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(61, 12);
-    ctx.lineTo(61, 52); // Right Pipe
-    ctx.stroke();
-  }
-
-  // 3. Engaged Status (Large Outer Dashed Circle)
-  if (obj.status === ObjectStatus.OBJECT_STATUS_ENGAGED) {
-    const destructive =
-      getComputedStyle(document.documentElement)
-        .getPropertyValue("--destructive")
-        .trim() || "#ef4444";
-
-    ctx.strokeStyle = destructive;
-    ctx.lineWidth = 2.5;
-    ctx.setLineDash([5, 3]);
-
-    ctx.beginPath();
-    // Radius 30 (60px wide) keeps it outside the 40px icon (12px padding)
-    ctx.arc(32, 32, 30, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-
+  const canvas = symbol.asCanvas();
   iconCache.set(key, canvas);
   return canvas;
 }
@@ -118,7 +190,6 @@ export function useCesiumObjects({
   const entityMap = useRef(new Map<string, Cesium.Entity>());
   const clickHandler = useRef<Cesium.ScreenSpaceEventHandler | null>(null);
 
-  // Use refs to avoid recreating event handlers when callbacks change
   const onObjectClickRef = useRef(onObjectClick);
   const onObjectDoubleClickRef = useRef(onObjectDoubleClick);
   const onObjectHoverRef = useRef(onObjectHover);
@@ -131,59 +202,44 @@ export function useCesiumObjects({
 
   useEffect(() => {
     if (!viewer) return;
-    let cancelled = false;
 
-    (async () => {
-      for (const obj of objects) {
-        if (cancelled) return;
+    for (const obj of objects) {
+      const cartesian = Cesium.Cartesian3.fromDegrees(
+        obj.longitude,
+        obj.latitude,
+        obj.altitude * 0.3048,
+      );
 
-        const position = Cesium.Cartesian3.fromDegrees(
-          obj.longitude,
-          obj.latitude,
-          obj.altitude * 0.3048,
-        );
+      const position = new Cesium.ConstantPositionProperty(cartesian);
 
-        const isSelected = obj.ulidString === selectedObjectId;
-        const icon = await buildIcon(obj, isSelected);
-        if (cancelled) return;
+      const isSelected = obj.ulidString === selectedObjectId;
+      const icon = buildIcon(obj, isSelected);
 
-        let entity = entityMap.current.get(obj.ulidString);
+      let entity = entityMap.current.get(obj.ulidString);
 
-        if (!entity) {
-          entity = viewer.entities.add({
-            id: obj.ulidString,
-            position: new Cesium.ConstantPositionProperty(position),
-            billboard: {
-              image: new Cesium.ConstantProperty(icon),
-              verticalOrigin: Cesium.VerticalOrigin.CENTER,
-              disableDepthTestDistance: Infinity,
-              scale: new Cesium.ConstantProperty(1.0),
-              scaleByDistance: new Cesium.NearFarScalar(
-                2_000,
-                1.5,
-                600_000,
-                0.5,
-              ),
-            },
-            properties: { objectData: obj },
-          });
+      if (!entity) {
+        entity = viewer.entities.add({
+          id: obj.ulidString,
+          position,
+          billboard: {
+            image: new Cesium.ConstantProperty(icon),
+            verticalOrigin: Cesium.VerticalOrigin.CENTER,
+            disableDepthTestDistance: Infinity,
+            scale: new Cesium.ConstantProperty(1.0),
+            scaleByDistance: new Cesium.NearFarScalar(2000, 1.5, 600000, 0.5),
+          },
+          properties: { objectData: obj },
+        });
 
-          entityMap.current.set(obj.ulidString, entity);
-        } else {
-          entity.position = new Cesium.ConstantPositionProperty(position);
-          entity.billboard!.image = new Cesium.ConstantProperty(icon);
-        }
+        entityMap.current.set(obj.ulidString, entity);
+      } else {
+        entity.position = position;
+        entity.billboard!.image = new Cesium.ConstantProperty(icon);
       }
+    }
 
-      viewer.scene.requestRender();
-    })();
-
-    return () => {
-      cancelled = true;
-    };
+    viewer.scene.requestRender();
   }, [viewer, objects, selectedObjectId]);
-
-  /* ───────────── Click & Hover Handling ───────────── */
 
   useEffect(() => {
     if (!viewer || clickHandler.current) return;
@@ -192,98 +248,25 @@ export function useCesiumObjects({
       viewer.scene.canvas,
     );
 
-    let hoveredEntity: Cesium.Entity | null = null;
-
-    // Single click handler
     clickHandler.current.setInputAction(
       (click: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
-        // Clear hover state on click
-        if (hoveredEntity) {
-          hoveredEntity.billboard!.scale = new Cesium.ConstantProperty(1.0);
-          if (onObjectHoverRef.current) {
-            onObjectHoverRef.current(null, null);
-          }
-          hoveredEntity = null;
-        }
-
         const picked = viewer.scene.pick(click.position);
         const obj = picked?.id?.properties?.objectData?.getValue() ?? null;
-        if (onObjectClickRef.current) {
-          onObjectClickRef.current(obj);
-        }
-        viewer.scene.requestRender();
+        onObjectClickRef.current?.(obj);
       },
       Cesium.ScreenSpaceEventType.LEFT_CLICK,
     );
 
-    // Double click handler
     clickHandler.current.setInputAction(
       (click: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
         const picked = viewer.scene.pick(click.position);
         const obj = picked?.id?.properties?.objectData?.getValue() ?? null;
-        if (onObjectDoubleClickRef.current) {
-          onObjectDoubleClickRef.current(obj);
-        }
-        viewer.scene.requestRender();
+        onObjectDoubleClickRef.current?.(obj);
       },
       Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK,
     );
 
-    // Hover handler
-    clickHandler.current.setInputAction(
-      (movement: Cesium.ScreenSpaceEventHandler.MotionEvent) => {
-        viewer.scene.requestRender();
-
-        const picked = viewer.scene.pick(movement.endPosition);
-        const newHovered = picked?.id ?? null;
-
-        if (hoveredEntity !== newHovered) {
-          // Mouse moved to different entity or empty space
-          if (hoveredEntity) {
-            hoveredEntity.billboard!.scale = new Cesium.ConstantProperty(1.0);
-          }
-
-          if (newHovered && newHovered.billboard) {
-            // Mouse entered new entity
-            newHovered.billboard.scale = new Cesium.ConstantProperty(1.15);
-            viewer.scene.canvas.style.cursor = "pointer";
-
-            const obj = newHovered.properties?.objectData?.getValue();
-            if (obj && onObjectHoverRef.current) {
-              onObjectHoverRef.current(obj, {
-                x: movement.endPosition.x,
-                y: movement.endPosition.y,
-              });
-            }
-          } else {
-            viewer.scene.canvas.style.cursor = "default";
-            if (onObjectHoverRef.current) {
-              onObjectHoverRef.current(null, null);
-            }
-          }
-
-          hoveredEntity = newHovered;
-        } else if (newHovered && onObjectHoverRef.current) {
-          // Same entity, update position
-          const obj = newHovered.properties?.objectData?.getValue();
-          if (obj) {
-            onObjectHoverRef.current(obj, {
-              x: movement.endPosition.x,
-              y: movement.endPosition.y,
-            });
-          }
-        }
-      },
-      Cesium.ScreenSpaceEventType.MOUSE_MOVE,
-    );
-
     return () => {
-      if (viewer.scene.canvas) {
-        viewer.scene.canvas.style.cursor = "default";
-      }
-      if (onObjectHoverRef.current) {
-        onObjectHoverRef.current(null, null);
-      }
       clickHandler.current?.destroy();
       clickHandler.current = null;
     };
