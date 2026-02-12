@@ -1,5 +1,3 @@
-import * as Cesium from "cesium";
-
 import {
   StandardIdentity,
   SymbolSet,
@@ -134,9 +132,14 @@ function drawPolygon(
  * The canvas is SIZE×SIZE; icons are drawn in a sub-region of ~SIZE*0.45.
  * ────────────────────────────────────────────────────────────────────────*/
 
-const SIZE = 64; // canvas size in px
-const C = SIZE / 2;
+const SIZE = 64; // logical icon size in px
+const PAD = 20; // extra space on each side so glow never clips
+const TOTAL = SIZE + PAD * 2; // actual canvas dimensions
+const C = TOTAL / 2; // center of canvas (== SIZE/2 + PAD)
 const ICON = SIZE * 0.22; // half-size of inner icon area
+
+/** Exported so Cesium can compensate for the transparent padding around the icon */
+export const ICON_PAD = PAD;
 
 type DrawFn = (ctx: CanvasRenderingContext2D) => void;
 
@@ -605,8 +608,8 @@ export function buildIcon(
   if (iconCache.has(key)) return iconCache.get(key)!;
 
   const canvas = document.createElement("canvas");
-  canvas.width = SIZE;
-  canvas.height = SIZE;
+  canvas.width = TOTAL;
+  canvas.height = TOTAL;
   const ctx = canvas.getContext("2d")!;
 
   const style =
