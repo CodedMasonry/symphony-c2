@@ -13,7 +13,7 @@ import {
   Object as ProtoObject,
 } from "@/generated/base";
 import { ObjectCard } from "./object-card";
-import { SYMBOL_SET_CONFIG, IDENTITY_CONFIG } from "../../lib/constants";
+import { SYMBOL_SET_CONFIG, IDENTITY_CONFIG } from "@/lib/constants";
 
 type ObjectWithId = ProtoObject & { ulidString: string };
 

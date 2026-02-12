@@ -6,20 +6,24 @@ import {
   SeaEntity,
 } from "@/generated/base";
 import { ObjectWithUlid } from "@/lib/proto_api";
+import { getIdentityCanvasColors } from "@/lib/colors";
 
 /* ─────────────────────────────────────────────────────────────────────────
  * DESIGN SYSTEM
  *
  * Affiliation → outer shape + color
- *   HOSTILE        → sharp octagon,  red   (#ef4444)
- *   FRIEND         → rounded hexagon, blue  (#3b82f6)
- *   NEUTRAL        → circle,          green (#22c55e)
- *   ASSUMED FRIEND → rounded hexagon, sky   (#38bdf8)  (dashed border)
- *   SUSPECT        → octagon,         orange (#f97316) (dashed border)
- *   PENDING        → circle,          amber  (#f59e0b) (dashed border)
- *   UNKNOWN        → diamond,         slate  (#94a3b8)
+ *   HOSTILE        → sharp octagon,  red
+ *   FRIEND         → rounded hexagon, blue
+ *   NEUTRAL        → circle,          green
+ *   ASSUMED FRIEND → rounded hexagon, sky   (dashed border)
+ *   SUSPECT        → octagon,         orange (dashed border)
+ *   PENDING        → circle,          amber  (dashed border)
+ *   UNKNOWN        → diamond,         slate
  *
  * Domain → inner SVG path silhouette drawn in white at ~50% of icon size
+ *
+ * NOTE: Colors are now managed in @/lib/unified-colors.ts
+ * Update Tailwind shades there to change colors across the entire app.
  * ────────────────────────────────────────────────────────────────────────*/
 
 interface IdentityStyle {
@@ -31,56 +35,62 @@ interface IdentityStyle {
 
 type ShapeType = "octagon" | "hexagon" | "circle" | "diamond" | "square";
 
-const IDENTITY_STYLES: Record<StandardIdentity, IdentityStyle> = {
-  [StandardIdentity.STANDARD_IDENTITY_HOSTILE]: {
-    fill: "#b91c1c",
-    stroke: "#ef4444",
-    shape: "octagon",
-    dashed: false,
-  },
-  [StandardIdentity.STANDARD_IDENTITY_FRIEND]: {
-    fill: "#1d4ed8",
-    stroke: "#3b82f6",
-    shape: "hexagon",
-    dashed: false,
-  },
-  [StandardIdentity.STANDARD_IDENTITY_NEUTRAL]: {
-    fill: "#15803d",
-    stroke: "#22c55e",
-    shape: "circle",
-    dashed: false,
-  },
-  [StandardIdentity.STANDARD_IDENTITY_ASSUMED_FRIEND]: {
-    fill: "#0369a1",
-    stroke: "#38bdf8",
-    shape: "hexagon",
-    dashed: true,
-  },
-  [StandardIdentity.STANDARD_IDENTITY_SUSPECT]: {
-    fill: "#c2410c",
-    stroke: "#f97316",
-    shape: "octagon",
-    dashed: true,
-  },
-  [StandardIdentity.STANDARD_IDENTITY_PENDING]: {
-    fill: "#b45309",
-    stroke: "#f59e0b",
-    shape: "circle",
-    dashed: true,
-  },
-  [StandardIdentity.STANDARD_IDENTITY_UNSPECIFIED]: {
-    fill: "#334155",
-    stroke: "#94a3b8",
-    shape: "diamond",
-    dashed: false,
-  },
-  [StandardIdentity.UNRECOGNIZED]: {
-    fill: "#334155",
-    stroke: "#94a3b8",
-    shape: "diamond",
-    dashed: false,
-  },
-};
+/**
+ * Generate complete identity style from unified color system
+ */
+function getIdentityStyle(identity: StandardIdentity): IdentityStyle {
+  const colors = getIdentityCanvasColors(identity);
+
+  // Shape and dashed pattern per identity
+  const shapeConfig: Record<
+    StandardIdentity,
+    { shape: ShapeType; dashed: boolean }
+  > = {
+    [StandardIdentity.STANDARD_IDENTITY_HOSTILE]: {
+      shape: "octagon",
+      dashed: false,
+    },
+    [StandardIdentity.STANDARD_IDENTITY_FRIEND]: {
+      shape: "hexagon",
+      dashed: false,
+    },
+    [StandardIdentity.STANDARD_IDENTITY_NEUTRAL]: {
+      shape: "circle",
+      dashed: false,
+    },
+    [StandardIdentity.STANDARD_IDENTITY_ASSUMED_FRIEND]: {
+      shape: "hexagon",
+      dashed: true,
+    },
+    [StandardIdentity.STANDARD_IDENTITY_SUSPECT]: {
+      shape: "octagon",
+      dashed: true,
+    },
+    [StandardIdentity.STANDARD_IDENTITY_PENDING]: {
+      shape: "circle",
+      dashed: true,
+    },
+    [StandardIdentity.STANDARD_IDENTITY_UNSPECIFIED]: {
+      shape: "diamond",
+      dashed: false,
+    },
+    [StandardIdentity.UNRECOGNIZED]: {
+      shape: "diamond",
+      dashed: false,
+    },
+  };
+
+  const config =
+    shapeConfig[identity] ??
+    shapeConfig[StandardIdentity.STANDARD_IDENTITY_UNSPECIFIED];
+
+  return {
+    fill: colors.fill,
+    stroke: colors.stroke,
+    shape: config.shape,
+    dashed: config.dashed,
+  };
+}
 
 /* ─────────────────────────────────────────────────────────────────────────
  * SHAPE PATHS  (all normalized to a 1x1 unit square, centered at 0.5,0.5)
@@ -184,7 +194,6 @@ const drawAircraft: DrawFn = (ctx) => {
 };
 
 const drawHelicopter: DrawFn = (ctx) => {
-  const r = ICON * 0.18;
   // Body oval
   ctx.beginPath();
   ctx.ellipse(C, C + ICON * 0.1, ICON * 0.55, ICON * 0.38, 0, 0, Math.PI * 2);
@@ -612,9 +621,7 @@ export function buildIcon(
   canvas.height = TOTAL;
   const ctx = canvas.getContext("2d")!;
 
-  const style =
-    IDENTITY_STYLES[obj.standardIdentity] ??
-    IDENTITY_STYLES[StandardIdentity.STANDARD_IDENTITY_UNSPECIFIED];
+  const style = getIdentityStyle(obj.standardIdentity);
 
   // 1. Background shape (affiliation)
   drawShape(ctx, style, selected);

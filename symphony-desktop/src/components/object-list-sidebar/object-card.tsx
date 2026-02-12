@@ -7,7 +7,7 @@ import {
   SymbolSet,
   StandardIdentity,
 } from "@/generated/base";
-import { IDENTITY_CONFIG, SYMBOL_SET_CONFIG } from "../../lib/constants";
+import { IDENTITY_CONFIG, SYMBOL_SET_CONFIG } from "@/lib/constants";
 import { formatTimestamp } from "@/lib/utils";
 
 interface ObjectCardProps {
@@ -20,7 +20,6 @@ export function ObjectCard({ object, isSelected, onClick }: ObjectCardProps) {
   const identity =
     IDENTITY_CONFIG[object.standardIdentity] ??
     IDENTITY_CONFIG[StandardIdentity.STANDARD_IDENTITY_UNSPECIFIED];
-
   const symbolSet =
     SYMBOL_SET_CONFIG[object.symbolSet] ??
     SYMBOL_SET_CONFIG[SymbolSet.SYMBOL_SET_UNSPECIFIED];
@@ -46,7 +45,6 @@ export function ObjectCard({ object, isSelected, onClick }: ObjectCardProps) {
           <span className="text-xs font-semibold leading-tight truncate">
             {object.callsign || object.model || "Unnamed Object"}
           </span>
-
           {/* Affiliation is the DOMINANT badge */}
           <Badge
             variant="outline"
@@ -65,7 +63,6 @@ export function ObjectCard({ object, isSelected, onClick }: ObjectCardProps) {
               </code>
             )}
           </span>
-
           {/* Symbol set is secondary, smaller, muted */}
           <Badge
             variant="outline"
@@ -89,7 +86,6 @@ export function ObjectCard({ object, isSelected, onClick }: ObjectCardProps) {
               {object.latitude.toFixed(3)}°,&nbsp;{object.longitude.toFixed(3)}°
             </span>
           </div>
-
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-0.5">
               <HugeiconsIcon

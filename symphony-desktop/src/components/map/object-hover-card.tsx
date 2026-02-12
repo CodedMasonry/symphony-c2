@@ -12,7 +12,6 @@ export function ObjectHoverCard({ object, position }: ObjectHoverCardProps) {
   const identity =
     IDENTITY_CONFIG[object.standardIdentity] ??
     IDENTITY_CONFIG[StandardIdentity.STANDARD_IDENTITY_UNSPECIFIED];
-
   const symbolSet =
     SYMBOL_SET_CONFIG[object.symbolSet] ??
     SYMBOL_SET_CONFIG[SymbolSet.SYMBOL_SET_UNSPECIFIED];
