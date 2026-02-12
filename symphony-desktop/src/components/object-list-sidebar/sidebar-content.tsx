@@ -5,7 +5,7 @@ import { LoaderCircle } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { SymbolSet, StandardIdentity } from "@/generated/base";
 import { DesignationSection } from "./designation-section";
-import { SYMBOL_SET_ORDER } from "../constants";
+import { SYMBOL_SET_ORDER } from "../../lib/constants";
 import { ObjectWithUlid as ObjectWithId } from "@/lib/proto_api";
 
 interface SidebarContentProps {

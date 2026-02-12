@@ -7,8 +7,8 @@ import {
   SymbolSet,
   StandardIdentity,
 } from "@/generated/base";
-import { IDENTITY_CONFIG, SYMBOL_SET_CONFIG } from "../constants";
-import { formatTimestamp } from "./utils";
+import { IDENTITY_CONFIG, SYMBOL_SET_CONFIG } from "../../lib/constants";
+import { formatTimestamp } from "@/lib/utils";
 
 interface ObjectCardProps {
   object: ProtoObject & { ulidString: string };

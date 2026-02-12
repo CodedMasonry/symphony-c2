@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { ObjectWithUlid } from "@/lib/proto_api";
 import { SymbolSet, StandardIdentity } from "@/generated/base";
-import { IDENTITY_CONFIG, SYMBOL_SET_CONFIG } from "../constants";
+import { IDENTITY_CONFIG, SYMBOL_SET_CONFIG } from "@/lib/constants";
 
 interface ObjectHoverCardProps {
   object: ObjectWithUlid;

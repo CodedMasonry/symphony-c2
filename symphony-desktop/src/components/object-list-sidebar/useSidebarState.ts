@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { SymbolSet, StandardIdentity } from "@/generated/base";
 import { ObjectWithUlid as ObjectWithId } from "@/lib/proto_api";
-import { DEFAULT_SELECTED_IDENTITIES } from "../constants";
+import { DEFAULT_SELECTED_IDENTITIES } from "../../lib/constants";
 
 export function useSidebarState(objects: ObjectWithId[]) {
   const [selectedIdentities, setSelectedIdentities] = useState<

@@ -17,7 +17,7 @@ import {
   IDENTITY_ORDER,
   IDENTITY_CONFIG,
   DEFAULT_SELECTED_IDENTITIES,
-} from "../constants";
+} from "../../lib/constants";
 
 interface DesignationFilterProps {
   onToggleDesignation: (identity: StandardIdentity) => void;
