@@ -47,9 +47,6 @@ importers:
       core:
         specifier: link:@tauri-apps/api/core
         version: link:@tauri-apps/api/core
-      milsymbol:
-        specifier: ^3.0.3
-        version: 3.0.3
       path:
         specifier: ^0.12.7
         version: 0.12.7
@@ -2417,9 +2414,6 @@ packages:
   micromatch@4.0.8:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
     engines: {node: '>=8.6'}
-
-  milsymbol@3.0.3:
-    resolution: {integrity: sha512-Fy/32WaGwitTTaILyLVxsh/pHsiBVKKieC0Ply/LRWLrOGivOB96WjGXSRWlWmXLI+wfoO6/vDfjwR7tyP47fA==}
 
   mime-db@1.54.0:
     resolution: {integrity: sha512-aU5EJuIN2WDemCcAp2vFBfp/m4EAhWJnUNSSw0ixs7/kXbd6Pg64EmwJkNdFhB8aWt1sH2CTXrLxo/iAGV3oPQ==}
@@ -5365,8 +5359,6 @@ snapshots:
     dependencies:
       braces: 3.0.3
       picomatch: 2.3.1
-
-  milsymbol@3.0.3: {}
 
   mime-db@1.54.0: {}
 
