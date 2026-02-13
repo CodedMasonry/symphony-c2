@@ -29,7 +29,7 @@ export function ObjectCard({ object, isSelected, onClick }: ObjectCardProps) {
       onClick={onClick}
       className={[
         // Base card
-        "group relative rounded-md border-l-[3px] border border-border/50 cursor-pointer",
+        "group relative rounded-md border-l-[3px] border border-border/50 cursor-default",
         "bg-card/60 backdrop-blur-sm transition-all duration-150",
         // Identity left-border (primary affiliation color signal)
         identity.border,

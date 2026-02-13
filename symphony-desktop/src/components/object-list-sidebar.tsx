@@ -45,7 +45,7 @@ export function ObjectListSidebar({
   return (
     <div
       className={cn(
-        "absolute top-4 bottom-12 left-4 z-30 transition-transform duration-300 ease-in-out",
+        "absolute top-4 bottom-14 left-4 z-30 transition-transform duration-300 ease-in-out",
         !isOpen && "-translate-x-90",
         className,
       )}
