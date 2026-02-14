@@ -5,8 +5,8 @@ import { TopBar } from "./components/top-bar";
 import { ObjectListSidebar } from "./components/object-list-sidebar";
 import { useObjectsStore } from "@/stores/objectsStore";
 import { useSidebarState } from "./components/object-list-sidebar/useSidebarState";
-import { ObjectCard } from "@/components/object-list-sidebar/object-card";
 import { useObjectSelection } from "@/hooks/useObjectSelection";
+import { SelectionSideBar } from "./components/selection-sidebar";
 
 export function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -48,19 +48,11 @@ export function App() {
             viewerRef={viewerRef}
           />
         </div>
-        {/* Floating UI Layer for Selected Object */}
         {selectedObject && (
-          <div className="fixed top-20 right-4 z-40 w-80 animate-in fade-in slide-in-from-right-4">
-            <div className="relative">
-              <button
-                onClick={() => selectObject(null)}
-                className="absolute -top-2 -right-2 z-50 h-6 w-6 rounded-full bg-background border shadow-md hover:bg-accent flex items-center justify-center text-muted-foreground"
-              >
-                ✕
-              </button>
-              <ObjectCard object={selectedObject} />
-            </div>
-          </div>
+          <SelectionSideBar
+            selectedObject={selectedObject}
+            selectObject={selectObject}
+          />
         )}
       </div>
     </div>

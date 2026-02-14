@@ -2,9 +2,9 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Refresh } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { DesignationFilter } from "./designation-filter"; // Keeping this import as requested
+import { DesignationFilter } from "./designation-filter";
 import { SearchBar } from "./searchbar";
-import { StandardIdentity } from "@/generated/base"; // Using the new Enum
+import { StandardIdentity } from "@/generated/base";
 
 interface SidebarHeaderProps {
   objectCount: number;
