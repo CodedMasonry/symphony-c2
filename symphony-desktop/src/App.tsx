@@ -51,7 +51,8 @@ export function App() {
         {selectedObject && (
           <SelectionSideBar
             selectedObject={selectedObject}
-            selectObject={selectObject}
+            onSelectObject={selectObject}
+            onObjectFlyTo={flyToObject}
           />
         )}
       </div>
