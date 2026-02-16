@@ -21,9 +21,16 @@ export const SYMBOL_SET_ORDER: SymbolSet[] = [
 
 export const DEFAULT_SELECTED_SYMBOL_SETS: SymbolSet[] = [
   SymbolSet.SYMBOL_SET_AIR,
+  SymbolSet.SYMBOL_SET_AIR_MISSILE,
+  SymbolSet.SYMBOL_SET_SPACE,
   SymbolSet.SYMBOL_SET_LAND_UNIT,
+  SymbolSet.SYMBOL_SET_LAND_CIVILIAN,
   SymbolSet.SYMBOL_SET_LAND_EQUIPMENT,
   SymbolSet.SYMBOL_SET_SEA_SURFACE,
+  SymbolSet.SYMBOL_SET_SEA_SUBSURFACE,
+  SymbolSet.SYMBOL_SET_ACTIVITIES,
+  SymbolSet.SYMBOL_SET_INSTALLATIONS,
+  SymbolSet.SYMBOL_SET_UNSPECIFIED,
 ];
 
 export const IDENTITY_ORDER: StandardIdentity[] = [
@@ -40,6 +47,8 @@ export const DEFAULT_SELECTED_IDENTITIES: StandardIdentity[] = [
   StandardIdentity.STANDARD_IDENTITY_HOSTILE,
   StandardIdentity.STANDARD_IDENTITY_NEUTRAL,
   StandardIdentity.STANDARD_IDENTITY_PENDING,
+  StandardIdentity.STANDARD_IDENTITY_ASSUMED_FRIEND,
+  StandardIdentity.STANDARD_IDENTITY_SUSPECT,
 ];
 
 /* ─────────────────────────────────────────────────────────────────────────

@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import { ObjectWithUlid } from "@/lib/proto_api";
-import { IDENTITY_CONFIG } from "@/lib/colors";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Close, Eye } from "@hugeicons/core-free-icons";
 import { Button } from "./ui/button";
@@ -12,10 +11,6 @@ interface SelectionSideBarProps extends React.ComponentProps<"div"> {
   onObjectFlyTo: (object: ObjectWithUlid) => void;
 }
 
-/*
-<button onClick={() => selectObject(null)}>✕</button>
-<ObjectCard object={selectedObject} />
-*/
 export function SelectionSideBar({
   className,
   selectedObject,
@@ -57,6 +52,11 @@ export function SelectionSideBar({
           >
             <HugeiconsIcon icon={Close} strokeWidth={4} />
           </Button>
+        </div>
+
+        {/* Header */}
+        <div>
+          <p>{selectedObject.callsign ?? selectedObject.symbolSet}</p>
         </div>
       </div>
     </div>

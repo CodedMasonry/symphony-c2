@@ -1,8 +1,8 @@
 import {
   Object as ProtoObject,
   ObjectList,
-  StandardIdentity, // Replacement for ObjectDesignation
-  SymbolSet, // Added for grouping
+  StandardIdentity,
+  SymbolSet,
 } from "@/generated/base";
 import { invoke } from "@tauri-apps/api/core";
 import { bytesToUlid } from "@/lib/ulid";
@@ -53,7 +53,7 @@ export function getIdentityName(identity: StandardIdentity): string {
     case StandardIdentity.STANDARD_IDENTITY_SUSPECT:
       return "Suspect";
     default:
-      return "Unspecified";
+      return "Unknown";
   }
 }
 

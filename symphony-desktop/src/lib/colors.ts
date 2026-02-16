@@ -1,4 +1,5 @@
 import { StandardIdentity, SymbolSet } from "@/generated/base";
+import { getIdentityName } from "./proto_api";
 
 /* ─────────────────────────────────────────────────────────────────────────
  * UNIFIED COLOR SYSTEM - HEX-FIRST APPROACH
@@ -272,33 +273,11 @@ export function getIdentityTailwindClasses(identity: StandardIdentity) {
 }
 
 /**
- * Get human-readable label for identity
- */
-export function getIdentityLabel(identity: StandardIdentity): string {
-  switch (identity) {
-    case StandardIdentity.STANDARD_IDENTITY_FRIEND:
-      return "Friend";
-    case StandardIdentity.STANDARD_IDENTITY_HOSTILE:
-      return "Hostile";
-    case StandardIdentity.STANDARD_IDENTITY_NEUTRAL:
-      return "Neutral";
-    case StandardIdentity.STANDARD_IDENTITY_PENDING:
-      return "Pending";
-    case StandardIdentity.STANDARD_IDENTITY_ASSUMED_FRIEND:
-      return "Assumed";
-    case StandardIdentity.STANDARD_IDENTITY_SUSPECT:
-      return "Suspect";
-    default:
-      return "Unknown";
-  }
-}
-
-/**
  * Get all styling data for a given identity
  */
 export function getIdentityStyles(identity: StandardIdentity) {
   return {
-    label: getIdentityLabel(identity),
+    label: getIdentityName(identity),
     canvas: getIdentityCanvasColors(identity),
     tailwind: getIdentityTailwindClasses(identity),
     hex: getIdentityHexColors(identity),
@@ -316,7 +295,7 @@ export const IDENTITY_CONFIG = Object.fromEntries(
       return [
         identity,
         {
-          label: getIdentityLabel(identity),
+          label: getIdentityName(identity),
           badge: tailwind.badge,
           border: tailwind.border,
           dot: tailwind.dot,
